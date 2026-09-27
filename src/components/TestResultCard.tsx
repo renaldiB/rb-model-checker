@@ -3,13 +3,12 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  Clock,
   Zap,
+  Activity,
   ChevronDown,
   ChevronUp,
   RefreshCw,
   Terminal,
-  Activity,
 } from 'lucide-react';
 import { TestResult } from '../types';
 
@@ -30,120 +29,122 @@ export const TestResultCard: React.FC<TestResultCardProps> = ({
     switch (result.status) {
       case 'passed':
         return (
-          <span className="flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold font-mono">
-            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-            LULUS (NATIVE)
+          <span className="px-3 py-1 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/30 text-[#4edea3] font-mono text-xs font-semibold">
+            PASSED ({result.score}%)
           </span>
         );
       case 'warning':
         return (
-          <span className="flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold font-mono">
-            <AlertTriangle className="w-3 h-3 text-amber-400" />
-            PERINGATAN
+          <span className="px-3 py-1 rounded-full bg-[#f59e0b]/10 border border-[#f59e0b]/30 text-[#f59e0b] font-mono text-xs font-semibold">
+            WARNING ({result.score}%)
           </span>
         );
       case 'failed':
         return (
-          <span className="flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 font-semibold font-mono">
-            <XCircle className="w-3 h-3 text-rose-400" />
-            GAGAL (MASKING)
+          <span className="px-3 py-1 rounded-full bg-[#f43f5e]/10 border border-[#f43f5e]/30 text-[#f43f5e] font-mono text-xs font-semibold">
+            FAILED ({result.score}%)
           </span>
         );
       case 'running':
         return (
-          <span className="flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-semibold font-mono animate-pulse">
-            <div className="w-2.5 h-2.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-            SEDANG DIUJI...
+          <span className="px-3 py-1 rounded-full bg-[#4cd7f6]/10 border border-[#4cd7f6]/30 text-[#4cd7f6] font-mono text-xs font-semibold animate-pulse flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#4cd7f6] animate-ping" />
+            TESTING...
           </span>
         );
       case 'idle':
       default:
         return (
-          <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700/60 font-medium font-mono">
-            BELUM DIUJI
+          <span className="px-3 py-1 rounded-full bg-[#181c24] border border-white/[0.08] text-[#86948a] font-mono text-xs">
+            STANDBY
           </span>
         );
     }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-emerald-400';
-    if (score >= 50) return 'text-amber-400';
-    return 'text-rose-400';
+  const getIndicatorDot = () => {
+    if (result.status === 'passed') return 'bg-[#4edea3]';
+    if (result.status === 'warning') return 'bg-[#f59e0b]';
+    if (result.status === 'failed') return 'bg-[#f43f5e]';
+    if (result.status === 'running') return 'bg-[#4cd7f6] animate-ping';
+    return 'bg-[#86948a]';
   };
 
   return (
-    <div className="bg-[#111726] border border-slate-800/80 hover:border-slate-700/80 transition-all rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col justify-between">
-      <div>
+    <div className="bg-[#1c2028]/60 backdrop-blur-md rounded-xl border border-white/[0.08] p-5 sm:p-6 flex flex-col justify-between hover:border-[#4cd7f6]/30 transition-all shadow-md space-y-4">
+      <div className="space-y-3.5">
         {/* Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className={`w-2.5 h-2.5 rounded-full ${getIndicatorDot()} shrink-0`} />
+            <h3 className="text-sm sm:text-base font-semibold text-[#dfe2ee] font-mono tracking-tight">
               {result.name}
             </h3>
           </div>
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            {getStatusBadge()}
-            {result.status !== 'idle' && result.status !== 'running' && (
-              <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-900 border border-slate-800 ${getScoreColor(result.score)}`}>
-                {result.score}/100
-              </span>
-            )}
-          </div>
+          <div className="shrink-0">{getStatusBadge()}</div>
         </div>
 
-        {/* Short description */}
-        <p className="text-xs text-slate-400 mb-3.5 leading-relaxed">
+        {/* Short Description */}
+        <p className="text-xs text-[#bbcabf] leading-relaxed">
           {result.shortDesc}
         </p>
 
-        {/* Live Metrics Chips if available */}
-        {(result.ttftMs !== undefined || result.tokensPerSec !== undefined || result.durationMs !== undefined) && (
-          <div className="flex flex-wrap items-center gap-2 mb-3.5 pt-2 border-t border-slate-800/60 font-mono text-[11px]">
+        {/* Monospace Metric Chips */}
+        {(result.ttftMs !== undefined || result.tokensPerSec !== undefined || result.jitterMs !== undefined || result.durationMs !== undefined) && (
+          <div className="flex flex-wrap gap-2 pt-1 font-mono text-[11px]">
             {result.ttftMs !== undefined && (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
-                <Zap className="w-3 h-3 text-amber-400" />
-                <span>TTFT:</span>
-                <span className={`font-bold ${result.ttftMs <= 850 ? 'text-emerald-400' : result.ttftMs <= 2000 ? 'text-amber-400' : 'text-rose-400'}`}>
-                  {result.ttftMs} ms
-                </span>
-              </div>
+              <span className="px-2.5 py-1 rounded-full bg-[#0a0e16] text-[#bbcabf] border border-white/[0.05] flex items-center gap-1">
+                <Zap className="w-3 h-3 text-[#4cd7f6]" />
+                TTFT: <strong className={result.ttftMs <= 850 ? 'text-[#4edea3]' : result.ttftMs <= 2000 ? 'text-[#f59e0b]' : 'text-[#f43f5e]'}>{result.ttftMs}ms</strong>
+              </span>
             )}
 
             {result.tokensPerSec !== undefined && result.tokensPerSec > 0 && (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
-                <Activity className="w-3 h-3 text-cyan-400" />
-                <span>Speed:</span>
-                <span className="font-bold text-cyan-300">{result.tokensPerSec} tok/s</span>
-              </div>
+              <span className="px-2.5 py-1 rounded-full bg-[#0a0e16] text-[#bbcabf] border border-white/[0.05] flex items-center gap-1">
+                <Activity className="w-3 h-3 text-[#4edea3]" />
+                Speed: <strong className="text-[#4edea3]">{result.tokensPerSec} tok/s</strong>
+              </span>
             )}
 
             {result.jitterMs !== undefined && (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
-                <span>Jitter:</span>
-                <span className={`font-bold ${result.jitterMs < 200 ? 'text-slate-200' : 'text-amber-400'}`}>
-                  ±{result.jitterMs} ms
-                </span>
-              </div>
+              <span className="px-2.5 py-1 rounded-full bg-[#0a0e16] text-[#bbcabf] border border-white/[0.05]">
+                Jitter: <strong className={result.jitterMs <= 200 ? 'text-[#dfe2ee]' : 'text-[#f59e0b]'}>±{result.jitterMs}ms</strong>
+              </span>
             )}
 
             {result.durationMs !== undefined && (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 ml-auto">
-                <Clock className="w-3 h-3" />
-                <span>{(result.durationMs / 1000).toFixed(2)}s</span>
-              </div>
+              <span className="px-2.5 py-1 rounded-full bg-[#0a0e16] text-[#86948a] border border-white/[0.05] ml-auto">
+                {(result.durationMs / 1000).toFixed(2)}s
+              </span>
             )}
+          </div>
+        )}
+
+        {/* Visual Latency Bar for TTFT Test */}
+        {result.id === 'latency-ttft' && result.ttftMs !== undefined && (
+          <div className="bg-[#0a0e16]/60 rounded-xl p-3 space-y-2 border border-white/[0.04] font-mono text-[10px]">
+            <div className="flex justify-between text-[#bbcabf]">
+              <span>Direct Upstream: {result.ttftMs}ms</span>
+              <span className="text-[#f43f5e]">Scraper Threshold: 1500ms</span>
+            </div>
+            <div className="w-full h-2 bg-[#262a33] rounded-full overflow-hidden relative">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${result.ttftMs <= 850 ? 'bg-[#4edea3]' : result.ttftMs <= 2000 ? 'bg-[#f59e0b]' : 'bg-[#f43f5e]'}`}
+                style={{ width: `${Math.min(100, (result.ttftMs / 2000) * 100)}%` }}
+              />
+              <div className="absolute top-0 bottom-0 left-[75%] w-0.5 bg-[#f43f5e]/80" title="1500ms threshold" />
+            </div>
           </div>
         )}
 
         {/* Anomalies Alert Box */}
         {result.anomalies && result.anomalies.length > 0 && (
-          <div className="mb-3 p-3 rounded-xl bg-rose-950/30 border border-rose-800/40 text-rose-200 text-xs space-y-1">
-            <span className="font-bold flex items-center gap-1.5 text-rose-400 uppercase text-[10px] tracking-wider">
-              <AlertTriangle className="w-3 h-3" />
-              Temuan Anomali:
+          <div className="p-3 rounded-xl bg-[#f43f5e]/10 border border-[#f43f5e]/30 text-[#ffb4ab] text-xs space-y-1 font-mono">
+            <span className="font-bold flex items-center gap-1.5 text-[#f43f5e] uppercase text-[10px] tracking-wider">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Temuan Anomali Spoofing:
             </span>
-            <ul className="list-disc list-inside space-y-0.5 text-slate-200">
+            <ul className="list-disc list-inside space-y-1 text-[#dfe2ee] text-[11px]">
               {result.anomalies.map((anom, i) => (
                 <li key={i}>{anom}</li>
               ))}
@@ -151,40 +152,42 @@ export const TestResultCard: React.FC<TestResultCardProps> = ({
           </div>
         )}
 
-        {/* Detailed Points */}
+        {/* Verification Checkpoints */}
         {result.details && result.details.length > 0 && (
-          <div className="mb-3 space-y-1 text-xs text-slate-300">
+          <div className="bg-[#0a0e16]/50 rounded-xl p-3 space-y-2 border border-white/[0.04]">
             {result.details.map((det, i) => (
-              <div key={i} className="flex items-start gap-1.5">
-                <span className="text-emerald-500 font-bold shrink-0">✓</span>
-                <span>{det}</span>
+              <div key={i} className="flex items-start gap-2 text-[#dfe2ee] font-mono text-xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#4edea3] shrink-0 mt-0.5" />
+                <span className="leading-relaxed">{det}</span>
               </div>
             ))}
           </div>
         )}
 
-        {/* Technical explanation */}
+        {/* Technical Explanation */}
         {result.technicalExplanation && (
-          <div className="text-[11px] text-slate-400 bg-slate-900/60 border border-slate-800/70 p-2.5 rounded-xl mb-3 leading-relaxed">
-            <span className="font-semibold text-slate-300 block mb-0.5">Analisis Teknis:</span>
+          <div className="text-[11px] text-[#bbcabf] bg-[#0a0e16]/40 border border-white/[0.05] p-3 rounded-xl leading-relaxed font-mono">
+            <span className="font-semibold text-[#dfe2ee] block mb-0.5">Analisis Forensik:</span>
             {result.technicalExplanation}
           </div>
         )}
 
-        {/* Raw output accordion */}
+        {/* Raw Output Accordion */}
         {result.rawOutput && (
-          <div className="mt-2">
+          <div className="pt-2 border-t border-white/[0.06]">
             <button
               type="button"
               onClick={() => setShowRaw(!showRaw)}
-              className="flex items-center gap-1 text-[11px] font-mono text-slate-400 hover:text-slate-200 transition cursor-pointer"
+              className="w-full text-left font-mono text-[11px] text-[#4cd7f6] hover:text-[#dfe2ee] flex items-center justify-between transition cursor-pointer"
             >
-              <Terminal className="w-3 h-3" />
-              <span>{showRaw ? 'Sembunyikan Raw Output' : 'Lihat Raw Output Respon'}</span>
-              {showRaw ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              <span className="flex items-center gap-1.5">
+                <Terminal className="w-3 h-3" />
+                <span>{showRaw ? 'Sembunyikan Raw Payload' : 'Lihat Raw Payload [JSON/Trace]'}</span>
+              </span>
+              {showRaw ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
             {showRaw && (
-              <pre className="mt-2 p-3 bg-black/60 border border-slate-800 rounded-xl text-[11px] font-mono text-slate-300 overflow-x-auto max-h-48 whitespace-pre-wrap">
+              <pre className="mt-2 p-3 bg-[#0a0e16] border border-white/[0.08] rounded-xl font-mono text-[11px] text-[#bbcabf] overflow-x-auto max-h-48 whitespace-pre-wrap select-all">
                 {result.rawOutput}
               </pre>
             )}
@@ -193,15 +196,15 @@ export const TestResultCard: React.FC<TestResultCardProps> = ({
       </div>
 
       {/* Action Footer */}
-      <div className="pt-3 border-t border-slate-800/60 mt-3 flex items-center justify-end">
+      <div className="pt-3 border-t border-white/[0.06] flex items-center justify-end">
         <button
           type="button"
           onClick={() => onRunSingle(result.id)}
           disabled={isRunning}
-          className="flex items-center gap-1.5 text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 transition cursor-pointer disabled:opacity-50"
+          className="flex items-center gap-1.5 font-mono text-xs font-medium text-[#bbcabf] hover:text-[#dfe2ee] px-3 py-1.5 rounded-lg bg-[#262a33] hover:bg-[#31353e] border border-white/[0.08] transition cursor-pointer disabled:opacity-50"
         >
           <RefreshCw className="w-3 h-3" />
-          <span>Uji Tes Ini Saja</span>
+          <span>Uji Modul Ini Saja</span>
         </button>
       </div>
     </div>

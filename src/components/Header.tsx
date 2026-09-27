@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, ShieldCheck, History, BookOpen, Server, Globe } from 'lucide-react';
+import { ShieldCheck, Server, Globe, BookOpen, History, Radio } from 'lucide-react';
 import { ProxyMode } from '../types';
 
 interface HeaderProps {
@@ -10,68 +10,91 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ proxyMode, onOpenHistory, onOpenMethodology }) => {
   return (
-    <header className="border-b border-slate-800 bg-[#0f1523]/80 backdrop-blur-md sticky top-0 z-40 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          {/* Logo & Title */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-400 p-[1px] shadow-lg shadow-emerald-500/20">
-              <div className="w-full h-full bg-[#0b0f17] rounded-[11px] flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              </div>
+    <header className="sticky top-0 left-0 right-0 z-50 bg-[#0a0e16]/85 backdrop-blur-xl border-b border-white/[0.08]">
+      <div className="max-w-[1520px] mx-auto h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        {/* Brand & Mode Indicator */}
+        <div className="flex items-center gap-3 sm:gap-5">
+          <div className="flex items-center gap-2.5">
+            <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-[#1c2028] border border-[#4edea3]/30 shadow-[0_0_12px_rgba(78,222,163,0.15)]">
+              <ShieldCheck className="w-5 h-5 text-[#4edea3]" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
-                  MODEL LEGIT CHECK
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium font-mono">
-                    v1.0
-                  </span>
-                </h1>
-              </div>
-              <p className="text-xs text-slate-400">
-                Pemeriksa Keaslian Endpoint AI & Detektor Masking / Reverse-Proxy
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <span className="font-bold text-sm sm:text-base uppercase tracking-wider text-[#dfe2ee]">
+                MODEL LEGIT CHECK
+              </span>
+              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-[#262a33] text-[#4edea3] border border-[#4edea3]/20 self-start sm:self-auto font-medium">
+                v1.0
+              </span>
             </div>
           </div>
 
-          {/* Quick Actions & Status */}
-          <div className="flex items-center gap-2.5 self-end sm:self-auto">
-            {/* Mode Indicator */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300">
+          {/* Mode Pill Indicator */}
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-[#181c24] border border-white/[0.08] text-xs font-mono">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4edea3] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4edea3]"></span>
+            </span>
+            <span className="text-[#bbcabf] text-[11px]">
               {proxyMode === 'server' ? (
                 <>
-                  <Server className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="hidden md:inline">Mode:</span>
-                  <span className="font-semibold text-cyan-300">Server Proxy (No CORS)</span>
+                  <span className="text-[#4cd7f6] font-semibold">Mode: Server Proxy</span> (Bypass CORS)
                 </>
               ) : (
                 <>
-                  <Globe className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden md:inline">Mode:</span>
-                  <span className="font-semibold text-amber-300">Direct Browser</span>
+                  <span className="text-[#4edea3] font-semibold">Mode: Direct Client</span> (Browser Fetch)
                 </>
               )}
-            </div>
+            </span>
+          </div>
+        </div>
 
-            {/* Methodology guide */}
+        {/* Navigation & Action Badges */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden md:flex items-center gap-1.5 text-xs font-mono">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="px-3 py-1.5 rounded-lg bg-[#262a33] text-[#dfe2ee] border border-[#4cd7f6]/30 font-semibold transition cursor-pointer"
+            >
+              Authenticity Radar
+            </button>
             <button
               onClick={onOpenMethodology}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 hover:text-white transition cursor-pointer"
-              title="Lihat metodologi pengujian teknis"
+              className="px-3 py-1.5 rounded-lg border border-white/[0.08] text-[#bbcabf] hover:bg-[#262a33] hover:text-[#dfe2ee] transition cursor-pointer flex items-center gap-1.5"
             >
-              <BookOpen className="w-3.5 h-3.5 text-teal-400" />
+              <BookOpen className="w-3.5 h-3.5 text-[#4cd7f6]" />
               <span>Metodologi</span>
             </button>
-
-            {/* History */}
             <button
               onClick={onOpenHistory}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 hover:text-white transition cursor-pointer"
-              title="Riwayat audit pengujian"
+              className="px-3 py-1.5 rounded-lg border border-white/[0.08] text-[#bbcabf] hover:bg-[#262a33] hover:text-[#dfe2ee] transition cursor-pointer flex items-center gap-1.5"
             >
-              <History className="w-3.5 h-3.5 text-slate-400" />
+              <History className="w-3.5 h-3.5 text-[#86948a]" />
               <span>Riwayat</span>
+            </button>
+          </div>
+
+          {/* Sentinel Status Badge */}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#181c24] border border-white/[0.08] font-mono text-[11px]">
+            <Radio className="w-3.5 h-3.5 text-[#4cd7f6] animate-pulse" />
+            <span className="text-[#bbcabf] hidden sm:inline">SENTINEL:</span>
+            <span className="text-[#4cd7f6] font-bold">ARMED // 24ms</span>
+          </div>
+
+          {/* Mobile Quick Action Buttons */}
+          <div className="flex md:hidden items-center gap-1">
+            <button
+              onClick={onOpenMethodology}
+              className="p-1.5 rounded bg-[#181c24] border border-white/[0.08] text-[#bbcabf] hover:text-[#dfe2ee]"
+              title="Metodologi"
+            >
+              <BookOpen className="w-4 h-4 text-[#4cd7f6]" />
+            </button>
+            <button
+              onClick={onOpenHistory}
+              className="p-1.5 rounded bg-[#181c24] border border-white/[0.08] text-[#bbcabf] hover:text-[#dfe2ee]"
+              title="Riwayat"
+            >
+              <History className="w-4 h-4 text-[#86948a]" />
             </button>
           </div>
         </div>

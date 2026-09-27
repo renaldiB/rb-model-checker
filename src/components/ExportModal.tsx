@@ -106,29 +106,29 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#111726] border border-slate-700/80 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="bg-[#1c2028] border border-white/[0.1] rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-800">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/[0.08]">
           <div className="flex items-center gap-2">
-            <Download className="w-5 h-5 text-emerald-400" />
-            <h3 className="text-base font-bold text-white">Ekspor Laporan Audit Keaslian Model</h3>
+            <Download className="w-5 h-5 text-[#4edea3]" />
+            <h3 className="text-base font-bold text-[#dfe2ee] font-mono">Ekspor Laporan Audit Keaslian Model</h3>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-200 transition p-1 cursor-pointer"
+            className="text-[#bbcabf] hover:text-[#dfe2ee] transition p-1 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Selector */}
-        <div className="flex items-center gap-2 px-5 pt-4 bg-[#0d121f] border-b border-slate-800">
+        <div className="flex items-center gap-2 px-5 pt-4 bg-[#181c24] border-b border-white/[0.08]">
           <button
             onClick={() => setTab('markdown')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold font-mono border-b-2 transition cursor-pointer ${
               tab === 'markdown'
-                ? 'border-emerald-500 text-emerald-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-[#4edea3] text-[#4edea3]'
+                : 'border-transparent text-[#bbcabf] hover:text-[#dfe2ee]'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -136,10 +136,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           </button>
           <button
             onClick={() => setTab('json')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold font-mono border-b-2 transition cursor-pointer ${
               tab === 'json'
-                ? 'border-emerald-500 text-emerald-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
+                ? 'border-[#4edea3] text-[#4edea3]'
+                : 'border-transparent text-[#bbcabf] hover:text-[#dfe2ee]'
             }`}
           >
             <Code className="w-4 h-4" />
@@ -148,26 +148,26 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Content Viewer */}
-        <div className="p-4 overflow-y-auto flex-1 bg-black/50 font-mono text-xs text-slate-300">
+        <div className="p-4 overflow-y-auto flex-1 bg-[#0a0e16] font-mono text-xs text-[#dfe2ee]/90">
           <pre className="whitespace-pre-wrap select-all">{exportText}</pre>
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between p-4 bg-[#0d121f] border-t border-slate-800">
-          <span className="text-xs text-slate-400">
-            Dapat langsung dibagikan ke tiket support, Github Issue, atau Discord/Telegram.
+        <div className="flex items-center justify-between p-4 bg-[#181c24] border-t border-white/[0.08]">
+          <span className="text-xs text-[#bbcabf] font-mono">
+            Dapat langsung dilampirkan ke tiket komplain support atau GitHub.
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#262a33] hover:bg-[#31353e] text-[#dfe2ee] text-xs font-semibold font-mono transition cursor-pointer border border-white/[0.08]"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-[#4edea3]" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Tersalin!' : 'Salin Teks'}</span>
             </button>
             <button
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-lg shadow-emerald-600/20 cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#4edea3] hover:bg-[#4edea3]/90 text-[#003824] text-xs font-bold font-mono transition shadow-lg shadow-[#4edea3]/20 cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Unduh File</span>

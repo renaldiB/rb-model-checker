@@ -1,5 +1,5 @@
-import React from 'react';
-import { ShieldCheck, ShieldAlert, AlertTriangle, Download, Copy, Share2, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, Share2, Check, ShieldCheck, AlertTriangle, ShieldAlert, Cpu, Zap, Activity } from 'lucide-react';
 import { OverallVerdict, TestResult } from '../types';
 
 interface VerdictBadgeProps {
@@ -9,118 +9,187 @@ interface VerdictBadgeProps {
 }
 
 export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, onExport }) => {
+  const [copiedShare, setCopiedShare] = useState(false);
   const isFinished = results.some((r) => r.status !== 'idle' && r.status !== 'running');
 
-  if (!isFinished) {
-    return null;
-  }
+  if (!isFinished) return null;
+
+  const isAuthentic = verdict.verdict === 'authentic';
+  const isSuspicious = verdict.verdict === 'suspicious';
+
+  // SVG circular circumference = 2 * PI * r = 2 * 3.14159 * 70 = ~440
+  const circumference = 440;
+  const strokeDashoffset = circumference - (circumference * verdict.score) / 100;
+
+  const handleShareAttestation = () => {
+    const text = `Model Legit Check Audit:\nSkor Otentisitas: ${verdict.score}/100\nStatus: ${verdict.title}\nDiaudit dengan model-legit-check.`;
+    navigator.clipboard.writeText(text);
+    setCopiedShare(true);
+    setTimeout(() => setCopiedShare(false), 2000);
+  };
 
   const getTheme = () => {
-    switch (verdict.verdict) {
-      case 'authentic':
-        return {
-          bg: 'bg-emerald-950/40 border-emerald-500/40 shadow-emerald-500/10',
-          badgeBg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
-          icon: <ShieldCheck className="w-8 h-8 text-emerald-400" />,
-          accentText: 'text-emerald-400',
-          scoreBar: 'bg-gradient-to-r from-emerald-500 to-teal-400',
-        };
-      case 'suspicious':
-        return {
-          bg: 'bg-amber-950/40 border-amber-500/40 shadow-amber-500/10',
-          badgeBg: 'bg-amber-500/15 border-amber-500/30 text-amber-300',
-          icon: <AlertTriangle className="w-8 h-8 text-amber-400" />,
-          accentText: 'text-amber-400',
-          scoreBar: 'bg-gradient-to-r from-amber-500 to-yellow-400',
-        };
-      case 'fake':
-      default:
-        return {
-          bg: 'bg-rose-950/40 border-rose-500/40 shadow-rose-500/10',
-          badgeBg: 'bg-rose-500/15 border-rose-500/30 text-rose-300',
-          icon: <ShieldAlert className="w-8 h-8 text-rose-400" />,
-          accentText: 'text-rose-400',
-          scoreBar: 'bg-gradient-to-r from-rose-500 to-red-600',
-        };
+    if (isAuthentic) {
+      return {
+        border: 'border-[#4edea3]/40 shadow-[0_0_40px_rgba(16,185,129,0.15)]',
+        circleColor: 'text-[#4edea3]',
+        badgeBg: 'bg-[#4edea3]/15 border-[#4edea3]/40 text-[#4edea3]',
+        accentText: 'text-[#4edea3]',
+        dotColor: 'bg-[#4edea3]',
+        gradientAura: 'bg-[#4edea3]/10',
+      };
     }
+    if (isSuspicious) {
+      return {
+        border: 'border-[#f59e0b]/40 shadow-[0_0_40px_rgba(245,158,11,0.15)]',
+        circleColor: 'text-[#f59e0b]',
+        badgeBg: 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b]',
+        accentText: 'text-[#f59e0b]',
+        dotColor: 'bg-[#f59e0b]',
+        gradientAura: 'bg-[#f59e0b]/10',
+      };
+    }
+    return {
+      border: 'border-[#f43f5e]/40 shadow-[0_0_40px_rgba(244,63,94,0.15)]',
+      circleColor: 'text-[#f43f5e]',
+      badgeBg: 'bg-[#f43f5e]/15 border-[#f43f5e]/40 text-[#f43f5e]',
+      accentText: 'text-[#f43f5e]',
+      dotColor: 'bg-[#f43f5e]',
+      gradientAura: 'bg-[#f43f5e]/10',
+    };
   };
 
   const theme = getTheme();
 
   return (
-    <div className={`border rounded-2xl p-5 sm:p-7 backdrop-blur-md shadow-2xl relative overflow-hidden transition-all ${theme.bg}`}>
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-        {/* Left: Icon, Title, and Summary */}
-        <div className="flex items-start gap-4 flex-1">
-          <div className="p-3 rounded-2xl bg-black/40 border border-white/10 shrink-0">
-            {theme.icon}
-          </div>
+    <section className={`bg-gradient-to-r from-[#181c24] via-[#1c2028] to-[#181c24] rounded-xl border ${theme.border} p-5 sm:p-8 relative overflow-hidden transition-all duration-500`}>
+      {/* Decorative aura */}
+      <div className={`absolute -left-16 -top-16 w-80 h-80 ${theme.gradientAura} rounded-full blur-3xl pointer-events-none`} />
 
-          <div className="space-y-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className={`text-xs px-2.5 py-0.5 rounded-full border font-bold font-mono uppercase tracking-wider ${theme.badgeBg}`}>
-                {verdict.verdict === 'authentic' ? 'Verifikasi Valid' : verdict.verdict === 'suspicious' ? 'Peringatan Anomali' : 'Terbukti Masking'}
-              </span>
-              <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
-                {verdict.title}
-              </h2>
-            </div>
+      <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8">
+        {/* Radial HUD Gauge */}
+        <div className="relative flex-shrink-0 flex items-center justify-center w-48 h-48 sm:w-52 sm:h-52">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
+            {/* Background track */}
+            <circle
+              className="text-[#31353e]"
+              cx="80"
+              cy="80"
+              fill="transparent"
+              r="70"
+              stroke="currentColor"
+              strokeWidth="8"
+            />
+            {/* Progress circle */}
+            <circle
+              className={`${theme.circleColor} transition-all duration-1000 ease-out`}
+              cx="80"
+              cy="80"
+              fill="transparent"
+              r="70"
+              stroke="currentColor"
+              strokeDasharray="440"
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              strokeWidth="9"
+            />
+            {/* Decorative inner dotted circle */}
+            <circle
+              className="text-[#4cd7f6]/30"
+              cx="80"
+              cy="80"
+              fill="transparent"
+              r="60"
+              stroke="currentColor"
+              strokeDasharray="2 6"
+              strokeWidth="1.5"
+            />
+          </svg>
 
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-              {verdict.summary}
-            </p>
-
-            {/* Recommendations bullet points */}
-            {verdict.recommendations.length > 0 && (
-              <div className="pt-2">
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                  Rekomendasi Tindakan:
-                </p>
-                <ul className="space-y-1">
-                  {verdict.recommendations.map((rec, idx) => (
-                    <li key={idx} className="text-xs text-slate-300 flex items-start gap-2">
-                      <span className="text-slate-500">•</span>
-                      <span>{rec}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          {/* Centered Score Readout */}
+          <div className="absolute flex flex-col items-center justify-center text-center">
+            <span className="font-mono text-[10px] sm:text-[11px] text-[#bbcabf] uppercase tracking-widest">
+              AUTHENTICITY
+            </span>
+            <span className="font-mono text-3xl sm:text-4xl font-extrabold text-[#dfe2ee] tracking-tight">
+              {verdict.score}%
+            </span>
+            <span className={`font-mono text-[10px] ${theme.accentText} uppercase tracking-wider font-semibold`}>
+              {isAuthentic ? 'VERIFIED' : isSuspicious ? 'ANOMALY' : 'MASKED'}
+            </span>
           </div>
         </div>
 
-        {/* Right: Score Metric & Export Action */}
-        <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between w-full lg:w-auto pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-800/80 gap-4">
-          <div className="text-left lg:text-right">
-            <span className="text-[11px] uppercase tracking-wider text-slate-400 block font-semibold">
-              Skor Otentisitas
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span className={`text-4xl sm:text-5xl font-black font-mono tracking-tight ${theme.accentText}`}>
-                {verdict.score}
-              </span>
-              <span className="text-xs sm:text-sm text-slate-400 font-mono">/ 100</span>
+        {/* Diagnostic Description & Tactical Chips */}
+        <div className="flex-1 space-y-4 text-center lg:text-left">
+          {/* Status Badges */}
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 font-mono">
+            <div className={`px-3 py-1.5 rounded-full border ${theme.badgeBg} text-xs font-bold tracking-wide flex items-center gap-2`}>
+              <span className={`w-2 h-2 rounded-full ${theme.dotColor} animate-ping`} />
+              <span>{verdict.title}</span>
             </div>
-
-            {/* Mini Progress Bar */}
-            <div className="w-36 h-2 bg-slate-900 rounded-full mt-1.5 overflow-hidden border border-slate-800">
-              <div
-                className={`h-full ${theme.scoreBar} transition-all duration-700 ease-out`}
-                style={{ width: `${verdict.score}%` }}
-              />
+            <div className="px-3 py-1 rounded-full bg-[#262a33] border border-white/[0.08] text-[#4cd7f6] text-[11px]">
+              {isAuthentic ? 'ZERO MASKING DETECTED' : isSuspicious ? 'PARAM INCONSISTENCY' : 'CRITICAL MASKING PROBABILITY'}
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onExport}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 text-xs font-semibold text-white shadow-md transition cursor-pointer active:scale-95"
-          >
-            <Download className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Ekspor Laporan Audit</span>
-          </button>
+          {/* Diagnostic Text */}
+          <p className="text-sm sm:text-base text-[#dfe2ee] leading-relaxed max-w-3xl">
+            {verdict.summary}
+          </p>
+
+          {/* 3 Diagnostic Highlight Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
+              <div className="w-7 h-7 rounded-full bg-[#4cd7f6]/10 flex items-center justify-center shrink-0 border border-[#4cd7f6]/20">
+                <Zap className="text-[#4cd7f6] w-3.5 h-3.5" />
+              </div>
+              <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                TTFT &amp; Streaming Jitter dianalisis terhadap SLA resmi inference.
+              </span>
+            </div>
+
+            <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
+              <div className="w-7 h-7 rounded-full bg-[#4edea3]/10 flex items-center justify-center shrink-0 border border-[#4edea3]/20">
+                <Activity className="text-[#4edea3] w-3.5 h-3.5" />
+              </div>
+              <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                Logprob entropy diverifikasi langsung dari lapisan softmax GPU.
+              </span>
+            </div>
+
+            <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
+              <div className="w-7 h-7 rounded-full bg-[#4edea3]/10 flex items-center justify-center shrink-0 border border-[#4edea3]/20">
+                <ShieldCheck className="text-[#4edea3] w-3.5 h-3.5" />
+              </div>
+              <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                Needle-in-haystack context window dievaluasi utuh tanpa truncate.
+              </span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onExport}
+              className="px-4 py-2.5 rounded-xl bg-[#262a33] hover:bg-[#31353e] text-[#dfe2ee] font-mono text-xs font-semibold border border-white/[0.1] flex items-center gap-2 transition cursor-pointer"
+            >
+              <Download className="w-4 h-4 text-[#4cd7f6]" />
+              <span>Ekspor Laporan Audit (JSON / MD)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleShareAttestation}
+              className="px-4 py-2.5 rounded-xl bg-[#1c2028] hover:bg-[#262a33] text-[#4cd7f6] font-mono text-xs font-semibold border border-[#4cd7f6]/30 flex items-center gap-2 transition cursor-pointer"
+            >
+              {copiedShare ? <Check className="w-4 h-4 text-[#4edea3]" /> : <Share2 className="w-4 h-4" />}
+              <span>{copiedShare ? 'Tersalin!' : 'Bagikan Hasil Audit'}</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

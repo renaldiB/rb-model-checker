@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff, Play, ShieldAlert, Sparkles, Server, Globe, Cpu, Key, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Eye, EyeOff, Play, Server, Globe, Key, Copy, Check, Radar, Layers } from 'lucide-react';
 import { EndpointConfig, PresetProvider } from '../types';
 
 interface EndpointConfigProps {
@@ -29,13 +29,13 @@ const PRESETS: PresetProvider[] = [
     description: 'Multi-provider aggregator',
   },
   {
-    name: 'Groq Cloud',
+    name: 'Groq Cloud LPU',
     baseUrl: 'https://api.groq.com/openai/v1',
     defaultModel: 'llama-3.3-70b-versatile',
     description: 'Ultra-fast LPU inference',
   },
   {
-    name: 'Ollama Local (localhost:11434)',
+    name: 'Ollama Local:11434',
     baseUrl: 'http://localhost:11434/v1',
     defaultModel: 'llama3',
     description: 'Inference lokal mesin Anda',
@@ -50,6 +50,21 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
 }) => {
   const [showKey, setShowKey] = useState(false);
   const [activePreset, setActivePreset] = useState<string>('');
+  const [copiedUrl, setCopiedUrl] = useState(false);
+
+  // Hotkey Cmd+Enter / Ctrl+Enter to run audit
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        if (!isRunning && config.baseUrl && config.model) {
+          e.preventDefault();
+          onRunAll();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isRunning, config.baseUrl, config.model, onRunAll]);
 
   const handlePresetSelect = (preset: PresetProvider) => {
     setActivePreset(preset.name);
@@ -60,192 +75,219 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
     });
   };
 
-  return (
-    <div className="bg-[#111726] border border-slate-800/80 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
-      {/* Decorative accent glow */}
-      <div className="absolute top-0 right-0 w-64 h-32 bg-emerald-500/5 rounded-full blur-3xl -z-0 pointer-events-none" />
+  const handleCopyUrl = () => {
+    if (!config.baseUrl) return;
+    navigator.clipboard.writeText(config.baseUrl);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
+  };
 
-      {/* Card Title & Presets */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-800/60">
-        <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-emerald-400" />
-            Konfigurasi Endpoint Target
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Tentukan Base URL, API Key, dan nama model yang ingin diuji keasliannya.
-          </p>
+  return (
+    <section className="bg-[#1c2028]/60 backdrop-blur-xl rounded-xl border border-white/[0.08] p-5 sm:p-7 shadow-xl relative overflow-hidden space-y-6">
+      {/* Decorative ambient aura */}
+      <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#4cd7f6]/5 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Target Route Presets Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-[#4cd7f6]/10 flex items-center justify-center border border-[#4cd7f6]/20">
+            <Layers className="w-4 h-4 text-[#4cd7f6]" />
+          </div>
+          <span className="font-mono text-xs sm:text-sm uppercase tracking-wider font-semibold text-[#dfe2ee]">
+            Target Route Presets
+          </span>
         </div>
 
-        {/* Preset quick buttons */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-xs text-slate-500 mr-1 font-medium">Preset Cepat:</span>
-          {PRESETS.map((p) => {
-            const isSelected = activePreset === p.name || config.baseUrl.includes(p.baseUrl);
+        {/* Preset Pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          {PRESETS.map((preset) => {
+            const isSelected = activePreset === preset.name || (config.baseUrl && config.baseUrl.includes(preset.baseUrl));
             return (
               <button
-                key={p.name}
+                key={preset.name}
                 type="button"
-                onClick={() => handlePresetSelect(p)}
-                className={`text-xs px-2.5 py-1 rounded-lg border transition cursor-pointer font-medium ${
+                onClick={() => handlePresetSelect(preset)}
+                className={`px-3.5 py-1.5 rounded-full font-mono text-xs transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
-                    : 'bg-slate-800/50 text-slate-300 border-slate-700/60 hover:bg-slate-700/60 hover:text-white'
+                    ? 'bg-[#4cd7f6]/15 border border-[#4cd7f6]/40 text-[#4cd7f6] shadow-[0_0_12px_rgba(6,182,212,0.25)] font-semibold'
+                    : 'border border-white/[0.08] text-[#bbcabf] hover:text-[#dfe2ee] hover:bg-[#262a33]'
                 }`}
               >
-                {p.name.split(' ')[0]}
+                {preset.name}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Form Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
+      {/* 3-Column Input Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
         {/* Base URL */}
-        <div className="lg:col-span-5">
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-            <span>Base URL Endpoint</span>
-            <span className="text-[10px] text-slate-500 font-normal font-mono">OpenAI Compatible</span>
+        <div className="md:col-span-5 flex flex-col gap-1.5">
+          <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
+            <span className="font-semibold uppercase tracking-wider">ENDPOINT BASE URL</span>
+            <span className="text-[#4cd7f6] text-[10px] px-2 py-0.5 rounded-full bg-[#4cd7f6]/10 border border-[#4cd7f6]/20 font-mono">
+              OPENAI COMPATIBLE
+            </span>
           </label>
-          <input
-            type="text"
-            value={config.baseUrl}
-            onChange={(e) => onChange({ ...config, baseUrl: e.target.value })}
-            placeholder="https://api.xyz.com/v1"
-            className="w-full bg-[#0b0f17] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono transition"
-          />
+          <div className="relative flex items-center">
+            <input
+              type="text"
+              value={config.baseUrl}
+              onChange={(e) => onChange({ ...config, baseUrl: e.target.value })}
+              placeholder="https://api.xyz.com/v1"
+              className="w-full bg-[#0a0e16]/90 border border-white/[0.1] rounded-xl px-4 py-2.5 text-[#dfe2ee] font-mono text-xs focus:border-[#4cd7f6] focus:ring-1 focus:ring-[#4cd7f6]/50 outline-none transition-all pr-12"
+            />
+            <button
+              type="button"
+              onClick={handleCopyUrl}
+              className="absolute right-2.5 p-1.5 rounded-lg hover:bg-[#262a33] text-[#bbcabf] hover:text-[#4cd7f6] transition cursor-pointer"
+              title="Salin URL"
+            >
+              {copiedUrl ? <Check className="w-3.5 h-3.5 text-[#4edea3]" /> : <Copy className="w-3.5 h-3.5" />}
+            </button>
+          </div>
         </div>
 
         {/* API Key */}
-        <div className="lg:col-span-4">
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-            <span className="flex items-center gap-1">
-              <Key className="w-3 h-3 text-slate-400" />
-              API Key / Bearer Token
+        <div className="md:col-span-4 flex flex-col gap-1.5">
+          <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
+            <span className="flex items-center gap-1 font-semibold uppercase tracking-wider">
+              <Key className="w-3 h-3 text-[#86948a]" />
+              BEARER TOKEN / API KEY
             </span>
-            <span className="text-[10px] text-emerald-400 font-normal">Disimpan Lokal Saja</span>
+            <span className="text-[#4edea3] text-[10px] px-2 py-0.5 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/20 font-mono">
+              DISIMPAN LOKAL
+            </span>
           </label>
-          <div className="relative">
+          <div className="relative flex items-center">
             <input
               type={showKey ? 'text' : 'password'}
               value={config.apiKey}
               onChange={(e) => onChange({ ...config, apiKey: e.target.value })}
               placeholder="sk-..."
-              className="w-full bg-[#0b0f17] border border-slate-700/80 rounded-xl px-3.5 py-2.5 pr-10 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono transition"
+              className="w-full bg-[#0a0e16]/90 border border-white/[0.1] rounded-xl px-4 py-2.5 text-[#dfe2ee] font-mono text-xs focus:border-[#4cd7f6] focus:ring-1 focus:ring-[#4cd7f6]/50 outline-none transition-all pr-10"
             />
             <button
               type="button"
               onClick={() => setShowKey(!showKey)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition p-1 cursor-pointer"
-              title={showKey ? 'Sembunyikan API key' : 'Tampilkan API key'}
+              className="absolute right-2.5 text-[#bbcabf] hover:text-[#dfe2ee] transition p-1.5 rounded-lg hover:bg-[#262a33] cursor-pointer"
+              title={showKey ? 'Sembunyikan' : 'Tampilkan'}
             >
               {showKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             </button>
           </div>
         </div>
 
-        {/* Model Name */}
-        <div className="lg:col-span-3">
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-            Model Name Target
+        {/* Model Identifier */}
+        <div className="md:col-span-3 flex flex-col gap-1.5">
+          <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
+            <span className="font-semibold uppercase tracking-wider">MODEL IDENTIFIER</span>
+            <span className="text-[10px] text-[#bbcabf]">PARAM TAG</span>
           </label>
-          <input
-            type="text"
-            value={config.model}
-            onChange={(e) => onChange({ ...config, model: e.target.value })}
-            placeholder="misal: gpt-4o, deepseek-chat"
-            className="w-full bg-[#0b0f17] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono transition"
-          />
+          <div className="relative flex items-center">
+            <input
+              type="text"
+              value={config.model}
+              onChange={(e) => onChange({ ...config, model: e.target.value })}
+              placeholder="misal: gpt-4o, deepseek-chat"
+              className="w-full bg-[#0a0e16]/90 border border-white/[0.1] rounded-xl px-4 py-2.5 text-[#dfe2ee] font-mono text-xs focus:border-[#4cd7f6] focus:ring-1 focus:ring-[#4cd7f6]/50 outline-none transition-all"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Advanced Settings Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 mt-4 pt-4 border-t border-slate-800/60 items-center">
-        {/* Context Stress Test Size */}
-        <div className="lg:col-span-5 flex items-center gap-3">
-          <span className="text-xs font-medium text-slate-400 whitespace-nowrap">
-            Stress Context Size:
-          </span>
-          <div className="flex items-center gap-1.5">
-            {[4000, 8000, 16000, 32000].map((size) => (
+      {/* Secondary Controls & Run Trigger Button */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pt-2 border-t border-white/[0.06]">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+          {/* Context Stress Segmented Toggle */}
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <span className="text-[#bbcabf] uppercase tracking-wider font-semibold text-[11px]">
+              Context Stress:
+            </span>
+            <div className="flex items-center rounded-xl bg-[#0a0e16]/90 p-1 border border-white/[0.08] gap-1">
+              {[4000, 8000, 16000, 32000].map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => onChange({ ...config, contextSize: size })}
+                  className={`px-3 py-1 rounded-lg text-xs font-mono transition cursor-pointer ${
+                    config.contextSize === size
+                      ? 'bg-[#4cd7f6]/20 text-[#4cd7f6] border border-[#4cd7f6]/40 font-semibold shadow-sm'
+                      : 'text-[#bbcabf] hover:text-[#dfe2ee]'
+                  }`}
+                >
+                  {size / 1000}k
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <span className="text-[#bbcabf] uppercase tracking-wider font-semibold text-[11px]">
+              Protocol:
+            </span>
+            <div className="flex items-center rounded-xl bg-[#0a0e16]/90 p-1 border border-white/[0.08] gap-1">
               <button
-                key={size}
                 type="button"
-                onClick={() => onChange({ ...config, contextSize: size })}
-                className={`text-xs px-2.5 py-1 rounded-lg border font-mono transition cursor-pointer ${
-                  config.contextSize === size
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-semibold'
-                    : 'bg-slate-800/40 text-slate-400 border-slate-700/50 hover:bg-slate-800 hover:text-slate-300'
+                onClick={() => onChange({ ...config, proxyMode: 'server' })}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono transition cursor-pointer ${
+                  config.proxyMode === 'server'
+                    ? 'bg-[#262a33] text-[#4cd7f6] border border-[#4cd7f6]/40 font-semibold shadow-sm'
+                    : 'text-[#bbcabf] hover:text-[#dfe2ee]'
                 }`}
+                title="Bypass CORS dan catat TTFT mikrodetik"
               >
-                {size / 1000}k
+                <Server className="w-3 h-3 text-[#4cd7f6]" />
+                <span>Server Proxy</span>
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={() => onChange({ ...config, proxyMode: 'browser' })}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono transition cursor-pointer ${
+                  config.proxyMode === 'browser'
+                    ? 'bg-[#262a33] text-[#4edea3] border border-[#4edea3]/40 font-semibold shadow-sm'
+                    : 'text-[#bbcabf] hover:text-[#dfe2ee]'
+                }`}
+                title="Langsung memanggil dari browser pengunjung (cocok untuk Netlify)"
+              >
+                <Globe className="w-3 h-3 text-[#4edea3]" />
+                <span>Direct Client</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Proxy Mode Selector */}
-        <div className="lg:col-span-4 flex items-center gap-2">
-          <span className="text-xs font-medium text-slate-400 whitespace-nowrap">
-            Mode Request:
-          </span>
-          <div className="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-800">
-            <button
-              type="button"
-              onClick={() => onChange({ ...config, proxyMode: 'server' })}
-              className={`flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md transition font-medium cursor-pointer ${
-                config.proxyMode === 'server'
-                  ? 'bg-cyan-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Bypass CORS dan rekam TTFT berakurasi mikrodetik via server lokal"
-            >
-              <Server className="w-3 h-3" />
-              <span>Server Proxy</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onChange({ ...config, proxyMode: 'browser' })}
-              className={`flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md transition font-medium cursor-pointer ${
-                config.proxyMode === 'browser'
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Langsung panggil dari browser via fetch (butuh endpoint ber-CORS)"
-            >
-              <Globe className="w-3 h-3" />
-              <span>Direct Client</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Run CTA Button */}
-        <div className="sm:col-span-2 lg:col-span-3 flex justify-end">
+        {/* High-impact Glowing Trigger Button */}
+        <div>
           <button
             type="button"
             onClick={onRunAll}
             disabled={isRunning || !config.baseUrl || !config.model}
-            className={`w-full sm:w-auto px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer ${
+            className={`w-full sm:w-auto relative group overflow-hidden px-8 py-3 rounded-xl font-bold font-mono text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer ${
               isRunning
-                ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-emerald-500/25 active:scale-95'
+                ? 'bg-[#262a33] text-[#bbcabf] cursor-not-allowed border border-white/10'
+                : 'bg-gradient-to-r from-[#4edea3] to-[#4cd7f6] text-[#003824] shadow-[0_0_24px_rgba(78,222,163,0.35)] hover:shadow-[0_0_36px_rgba(78,222,163,0.55)] active:scale-[0.99]'
             }`}
           >
             {isRunning ? (
               <>
-                <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
-                <span>Menguji Endpoint...</span>
+                <div className="w-4 h-4 border-2 border-[#4cd7f6] border-t-transparent rounded-full animate-spin" />
+                <span>VERIFYING SENSORS...</span>
               </>
             ) : (
               <>
-                <Play className="w-4 h-4 fill-current" />
-                <span>Jalankan Semua Uji (Audit)</span>
+                <Radar className="w-4 h-4 transition-transform group-hover:rotate-180 duration-500 text-[#003824]" />
+                <span className="tracking-wide">RUN FORENSIC AUDIT</span>
+                <kbd className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-black/25 text-[10px] text-[#003824] font-mono border border-black/20 font-medium">
+                  ⌘ Enter
+                </kbd>
               </>
             )}
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

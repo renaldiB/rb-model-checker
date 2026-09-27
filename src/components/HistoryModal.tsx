@@ -77,6 +77,10 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                         <span className="flex items-center gap-1 text-[10px] text-[#4edea3] font-semibold font-mono">
                           <CheckCircle2 className="w-3 h-3" /> VERIFIED NATIVE
                         </span>
+                      ) : item.verdict.verdict === 'invalid_config' ? (
+                        <span className="flex items-center gap-1 text-[10px] text-[#f59e0b] font-semibold font-mono">
+                          <AlertTriangle className="w-3 h-3" /> CONFIG ERROR
+                        </span>
                       ) : isSuspicious ? (
                         <span className="flex items-center gap-1 text-[10px] text-[#f59e0b] font-semibold font-mono">
                           <AlertTriangle className="w-3 h-3" /> ANOMALY DETECTED

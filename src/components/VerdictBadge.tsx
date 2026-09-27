@@ -16,6 +16,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
 
   const isAuthentic = verdict.verdict === 'authentic';
   const isSuspicious = verdict.verdict === 'suspicious';
+  const isInvalidConfig = verdict.verdict === 'invalid_config';
 
   // SVG circular circumference = 2 * PI * r = 2 * 3.14159 * 70 = ~440
   const circumference = 440;
@@ -37,6 +38,16 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
         accentText: 'text-[#4edea3]',
         dotColor: 'bg-[#4edea3]',
         gradientAura: 'bg-[#4edea3]/10',
+      };
+    }
+    if (isInvalidConfig) {
+      return {
+        border: 'border-[#f59e0b]/40 shadow-[0_0_40px_rgba(245,158,11,0.15)]',
+        circleColor: 'text-[#f59e0b]',
+        badgeBg: 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b]',
+        accentText: 'text-[#f59e0b]',
+        dotColor: 'bg-[#f59e0b]',
+        gradientAura: 'bg-[#f59e0b]/10',
       };
     }
     if (isSuspicious) {
@@ -115,7 +126,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
               {verdict.score}%
             </span>
             <span className={`font-mono text-[10px] ${theme.accentText} uppercase tracking-wider font-semibold`}>
-              {isAuthentic ? 'VERIFIED' : isSuspicious ? 'ANOMALY' : 'MASKED'}
+              {isAuthentic ? 'VERIFIED' : isInvalidConfig ? 'CONFIG ERR' : isSuspicious ? 'ANOMALY' : 'MASKED'}
             </span>
           </div>
         </div>
@@ -129,7 +140,13 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
               <span>{verdict.title}</span>
             </div>
             <div className="px-3 py-1 rounded-full bg-[#262a33] border border-white/[0.08] text-[#4cd7f6] text-[11px]">
-              {isAuthentic ? 'ZERO MASKING DETECTED' : isSuspicious ? 'PARAM INCONSISTENCY' : 'CRITICAL MASKING PROBABILITY'}
+              {isAuthentic
+                ? 'ZERO MASKING DETECTED'
+                : isInvalidConfig
+                ? 'CONFIG / AUTH REJECTED'
+                : isSuspicious
+                ? 'PARAM INCONSISTENCY'
+                : 'CRITICAL MASKING PROBABILITY'}
             </div>
           </div>
 
@@ -138,35 +155,49 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
             {verdict.summary}
           </p>
 
-          {/* 3 Diagnostic Highlight Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-            <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
-              <div className="w-7 h-7 rounded-full bg-[#4cd7f6]/10 flex items-center justify-center shrink-0 border border-[#4cd7f6]/20">
-                <Zap className="text-[#4cd7f6] w-3.5 h-3.5" />
-              </div>
-              <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
-                TTFT &amp; Streaming Jitter dianalisis terhadap SLA resmi inference.
+          {/* Diagnostic Highlight Cards or Recommendations */}
+          {isInvalidConfig && verdict.recommendations?.length > 0 ? (
+            <div className="bg-[#0a0e16]/80 border border-[#f59e0b]/30 rounded-xl p-4 text-left font-mono text-xs space-y-2">
+              <span className="text-[#f59e0b] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4" />
+                Langkah Perbaikan Konfigurasi:
               </span>
+              <ul className="list-disc list-inside space-y-1.5 text-[#dfe2ee] text-[11px] leading-relaxed">
+                {verdict.recommendations.map((rec, i) => (
+                  <li key={i}>{rec}</li>
+                ))}
+              </ul>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
+                <div className="w-7 h-7 rounded-full bg-[#4cd7f6]/10 flex items-center justify-center shrink-0 border border-[#4cd7f6]/20">
+                  <Zap className="text-[#4cd7f6] w-3.5 h-3.5" />
+                </div>
+                <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                  TTFT &amp; Streaming Jitter dianalisis terhadap SLA resmi inference.
+                </span>
+              </div>
 
-            <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
-              <div className="w-7 h-7 rounded-full bg-[#4edea3]/10 flex items-center justify-center shrink-0 border border-[#4edea3]/20">
-                <Activity className="text-[#4edea3] w-3.5 h-3.5" />
+              <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
+                <div className="w-7 h-7 rounded-full bg-[#4edea3]/10 flex items-center justify-center shrink-0 border border-[#4edea3]/20">
+                  <Activity className="text-[#4edea3] w-3.5 h-3.5" />
+                </div>
+                <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                  Logprob entropy diverifikasi langsung dari lapisan softmax GPU.
+                </span>
               </div>
-              <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
-                Logprob entropy diverifikasi langsung dari lapisan softmax GPU.
-              </span>
-            </div>
 
-            <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
-              <div className="w-7 h-7 rounded-full bg-[#4edea3]/10 flex items-center justify-center shrink-0 border border-[#4edea3]/20">
-                <ShieldCheck className="text-[#4edea3] w-3.5 h-3.5" />
+              <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
+                <div className="w-7 h-7 rounded-full bg-[#4edea3]/10 flex items-center justify-center shrink-0 border border-[#4edea3]/20">
+                  <ShieldCheck className="text-[#4edea3] w-3.5 h-3.5" />
+                </div>
+                <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                  Needle-in-haystack context window dievaluasi utuh tanpa truncate.
+                </span>
               </div>
-              <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
-                Needle-in-haystack context window dievaluasi utuh tanpa truncate.
-              </span>
             </div>
-          </div>
+          )}
 
           {/* Actions */}
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">

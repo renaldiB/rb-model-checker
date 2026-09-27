@@ -46,7 +46,7 @@ export interface StreamEventData {
 
 export interface OverallVerdict {
   score: number;
-  verdict: 'authentic' | 'suspicious' | 'fake';
+  verdict: 'authentic' | 'suspicious' | 'fake' | 'invalid_config';
   title: string;
   summary: string;
   recommendations: string[];

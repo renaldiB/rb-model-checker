@@ -99,12 +99,31 @@ export function evaluateTtftTest(
   technicalExplanation: string;
 } {
   if (error) {
+    const lower = error.toLowerCase();
+    const isAuth = lower.includes('401') || lower.includes('unauthorized') || lower.includes('invalid api key') || lower.includes('api key');
+    const isModel = lower.includes('model_not_found') || lower.includes('model not found') || lower.includes('does not exist') || lower.includes('no endpoints');
+    const isNetwork = lower.includes('failed to fetch') || lower.includes('network error') || lower.includes('connection') || lower.includes('tidak dapat dijangkau');
+
+    let anomalyText = 'Endpoint menolak koneksi streaming.';
+    let explanationText = 'Layanan reverse-proxy web scraping sering memutus koneksi streaming atau mengalami rate-limit 429 saat memproses traffic.';
+
+    if (isAuth) {
+      anomalyText = 'Autentikasi ditolak: API Key tidak valid atau tidak memiliki izin akses (HTTP 401).';
+      explanationText = 'Server upstream menolak request karena API Key salah atau kedaluwarsa. Periksa nilai API Key Anda.';
+    } else if (isModel) {
+      anomalyText = 'Nama model tidak ditemukan di endpoint ini (HTTP 404/400).';
+      explanationText = 'Server tidak mengenali nama model yang diinput. Periksa ejaan atau format prefix vendor.';
+    } else if (isNetwork) {
+      anomalyText = 'Gagal menghubungi Base URL server.';
+      explanationText = 'Koneksi ke Base URL gagal. Periksa format URL atau gunakan mode Direct Client/Server Proxy yang sesuai.';
+    }
+
     return {
       score: 0,
       status: 'failed',
       details: [`Koneksi streaming gagal: ${error}`],
-      anomalies: ['Endpoint menolak atau gagal melayani koneksi streaming.'],
-      technicalExplanation: 'Layanan reverse-proxy web scraping sering memutus koneksi streaming atau mengalami rate-limit 429 saat memproses traffic.',
+      anomalies: [anomalyText],
+      technicalExplanation: explanationText,
     };
   }
 
@@ -166,7 +185,26 @@ export function evaluateLogprobsTest(
   let score = 100;
 
   if (!res.ok) {
-    anomalies.push(`Request logprobs ditolak dengan HTTP ${res.status}: ${JSON.stringify(res.data?.error || res.data)}`);
+    const errObj = res.data?.error || res.data;
+    const errStr = typeof errObj === 'string' ? errObj : JSON.stringify(errObj);
+    const lower = errStr.toLowerCase();
+
+    const isAuth = res.status === 401 || lower.includes('401') || lower.includes('unauthorized') || lower.includes('api key');
+    const isModel = res.status === 404 || lower.includes('model_not_found') || lower.includes('does not exist') || lower.includes('no endpoints');
+
+    if (isAuth || isModel) {
+      return {
+        score: 0,
+        status: 'failed',
+        details: [`Request logprobs ditolak (${res.status}): ${errStr}`],
+        anomalies: [isAuth ? 'API Key tidak valid (HTTP 401).' : 'Model tidak ditemukan di endpoint ini.'],
+        technicalExplanation: isAuth
+          ? 'Autentikasi ditolak: API Key salah atau tidak memiliki izin akses.'
+          : 'Nama model tidak terdaftar pada endpoint provider ini.',
+      };
+    }
+
+    anomalies.push(`Request logprobs ditolak dengan HTTP ${res.status}: ${errStr}`);
     score = 25;
     details.push('Endpoint menolak parameter logprobs / top_logprobs.');
     return {
@@ -223,13 +261,27 @@ export function evaluateContextTest(
   details.push(`Total waktu proses context: ${(durationMs / 1000).toFixed(2)} detik`);
 
   if (error) {
-    anomalies.push(`Gagal memproses context window besar (~${targetTokens} tokens): ${error}`);
+    const lower = error.toLowerCase();
+    const isAuth = lower.includes('401') || lower.includes('unauthorized') || lower.includes('api key');
+    const isModel = lower.includes('model_not_found') || lower.includes('model not found') || lower.includes('does not exist') || lower.includes('no endpoints');
+
+    let anomalyText = `Gagal memproses context window besar (~${targetTokens} tokens): ${error}`;
+    let explanationText = 'Reverse-proxy web gratisan biasanya langsung crash (HTTP 502/504 Bad Gateway, payload too large, atau socket timeout) ketika dikirimi payload di atas 8.000 token.';
+
+    if (isAuth) {
+      anomalyText = 'Request context stress ditolak: API Key tidak valid (HTTP 401).';
+      explanationText = 'Otentikasi gagal saat mengirim payload stress test. Periksa API Key Anda.';
+    } else if (isModel) {
+      anomalyText = 'Request context stress ditolak: Nama model tidak ditemukan di endpoint.';
+      explanationText = 'Nama model tidak terdaftar untuk memproses context window besar.';
+    }
+
     return {
       score: 0,
       status: 'failed',
       details,
-      anomalies,
-      technicalExplanation: `Reverse-proxy web gratisan biasanya langsung crash (HTTP 502/504 Bad Gateway, payload too large, atau socket timeout) ketika dikirimi payload di atas 8.000 token.`,
+      anomalies: [anomalyText],
+      technicalExplanation: explanationText,
     };
   }
 
@@ -313,14 +365,136 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
     };
   }
 
+  const executedResults = results.filter((r) => r.status !== 'skipped' && r.status !== 'idle');
+  if (executedResults.length === 0) {
+    return {
+      score: 0,
+      verdict: 'suspicious',
+      title: 'Pengujian Belum Selesai',
+      summary: 'Silakan jalankan pengujian untuk mengukur keaslian endpoint model.',
+      recommendations: ['Pilih endpoint dan klik "Jalankan Semua Pengujian".'],
+    };
+  }
+
+  // Cek apakah kegagalan disebabkan oleh Base URL / API Key / Model / Jaringan
+  const allTexts = executedResults
+    .flatMap((r) => [...r.details, ...r.anomalies, r.technicalExplanation, r.rawOutput || ''])
+    .join(' ')
+    .toLowerCase();
+
+  const isAuthError =
+    allTexts.includes('401') ||
+    allTexts.includes('unauthorized') ||
+    allTexts.includes('invalid api key') ||
+    allTexts.includes('incorrect api key') ||
+    allTexts.includes('invalid_api_key') ||
+    allTexts.includes('authentication') ||
+    allTexts.includes('bearer');
+
+  const isModelError =
+    allTexts.includes('model_not_found') ||
+    allTexts.includes('model not found') ||
+    allTexts.includes('no endpoints found') ||
+    allTexts.includes('does not exist') ||
+    allTexts.includes('unknown model') ||
+    allTexts.includes('invalid model') ||
+    allTexts.includes('not found for') ||
+    allTexts.includes('is not supported');
+
+  const isNetworkOrUrlError =
+    allTexts.includes('failed to fetch') ||
+    allTexts.includes('network error') ||
+    allTexts.includes('econnrefused') ||
+    allTexts.includes('enotfound') ||
+    allTexts.includes('tidak dapat dijangkau') ||
+    allTexts.includes('cors') ||
+    allTexts.includes('net::err');
+
+  const isQuotaError =
+    allTexts.includes('insufficient_quota') ||
+    allTexts.includes('exceeded your current quota') ||
+    allTexts.includes('credits') ||
+    (allTexts.includes('quota') && allTexts.includes('429'));
+
+  // Jika semua tes gagal atau skor 0 karena kegagalan otentikasi / model / URL / kuota
+  const allTestsFailed = executedResults.every((r) => r.status === 'failed' || r.score === 0);
+
+  if (allTestsFailed && (isAuthError || isModelError || isNetworkOrUrlError || isQuotaError)) {
+    if (isAuthError) {
+      return {
+        score: 0,
+        verdict: 'invalid_config',
+        title: '⚠️ API KEY TIDAK VALID / DITOLAK (401)',
+        summary: 'Endpoint menolak pengujian karena API Key / Bearer Token tidak valid, tidak memiliki izin, atau telah kedaluwarsa (HTTP 401 Unauthorized). Hasil ini bukan karena model palsu (masking), melainkan otentikasi akun gagal.',
+        recommendations: [
+          'Periksa kembali nilai API Key yang Anda masukkan pada form konfigurasi.',
+          'Pastikan tidak ada karakter spasi ekstra di awal atau akhir token.',
+          'Pastikan API Key memiliki status aktif dan kuota yang cukup pada dashboard vendor Anda.',
+        ],
+      };
+    }
+
+    if (isModelError) {
+      return {
+        score: 0,
+        verdict: 'invalid_config',
+        title: '⚠️ NAMA MODEL TIDAK DITEMUKAN / TIDAK VALID (404/400)',
+        summary: 'Penyedia API menolak permintaan karena nama model yang diinput tidak terdaftar pada server mereka (HTTP 400/404 Model Not Found). Hasil ini bukan karena model palsu (masking), melainkan kesalahan penulisan identifier model.',
+        recommendations: [
+          'Periksa ejaan nama model pada input MODEL IDENTIFIER.',
+          'Jika menggunakan OpenRouter, wajib sertakan prefix vendor (contoh: deepseek/deepseek-chat atau openai/gpt-4o).',
+          'Jika menggunakan API resmi (OpenAI/DeepSeek), pastikan tanpa prefix vendor (contoh: cukup deepseek-chat atau gpt-4o).',
+          'Cek dokumentasi provider Anda untuk melihat daftar nama model aktif yang didukung.',
+        ],
+      };
+    }
+
+    if (isNetworkOrUrlError) {
+      return {
+        score: 0,
+        verdict: 'invalid_config',
+        title: '⚠️ BASE URL TIDAK VALID / KONEKSI GAGAL',
+        summary: 'Aplikasi tidak dapat menghubungi alamat Base URL yang Anda masukkan (Koneksi gagal / URL 404 / Terblokir CORS). Hasil ini bukan karena model palsu (masking), melainkan endpoint tidak dapat dijangkau.',
+        recommendations: [
+          'Periksa kembali format Base URL (contoh: https://api.openai.com/v1 atau https://api.deepseek.com/v1).',
+          'Jika membuka web ini dari Netlify/hosting online, pastikan Protocol disetel ke "Direct Client".',
+          'Pastikan server tujuan mengizinkan akses dari browser (CORS Policy) atau gunakan Server Proxy lokal.',
+        ],
+      };
+    }
+
+    if (isQuotaError) {
+      return {
+        score: 0,
+        verdict: 'invalid_config',
+        title: '⚠️ KUOTA / SALDO TOKEN API HABIS (429)',
+        summary: 'Penyedia API menolak pengujian karena kuota atau saldo billing pada akun API Key Anda telah habis (HTTP 429 Insufficient Quota). Hasil ini bukan karena model palsu (masking), melainkan saldo akun habis.',
+        recommendations: [
+          'Isi ulang saldo (top up billing) pada dashboard penyedia AI Anda.',
+          'Gunakan API Key lain yang masih memiliki sisa saldo aktif.',
+        ],
+      };
+    }
+
+    return {
+      score: 0,
+      verdict: 'invalid_config',
+      title: '⚠️ KONFIGURASI TIDAK VALID / ENDPOINT GAGAL DIHUBUNGI',
+      summary: 'Semua pengujian gagal berkomunikasi dengan endpoint AI. Kegagalan ini disebabkan oleh Base URL, API Key, atau Model Identifier yang tidak valid, bukan karena indikasi manipulasi model.',
+      recommendations: [
+        'Periksa kembali ketiga parameter: Base URL, API Key, dan nama model.',
+        'Pastikan endpoint AI Anda aktif dan dapat menerima permintaan.',
+      ],
+    };
+  }
+
+  // Evaluasi normal untuk model yang berhasil merespon
   let totalWeight = 0;
   let weightedScore = 0;
 
-  for (const r of results) {
-    if (r.status !== 'skipped' && r.status !== 'idle') {
-      weightedScore += r.score * r.weight;
-      totalWeight += r.weight;
-    }
+  for (const r of executedResults) {
+    weightedScore += r.score * r.weight;
+    totalWeight += r.weight;
   }
 
   const finalScore = totalWeight > 0 ? Math.round(weightedScore / totalWeight) : 0;

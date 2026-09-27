@@ -357,7 +357,7 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
       recommendations: [
         'Hentikan penggunaan endpoint ini untuk sistem penting karena berisiko error 502/429 tiba-tiba.',
         'Layanan masking sering kali menyensor, memotong, atau mengubah output tanpa izin.',
-        'Segera minta klarifikasi ke penyedia API (misal Dattio/reseller) terkait lisensi upstream resminya.',
+        'Segera minta klarifikasi ke penyedia API / reseller terkait lisensi upstream resminya.',
       ],
     };
   }

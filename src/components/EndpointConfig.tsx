@@ -11,22 +11,16 @@ interface EndpointConfigProps {
 
 const PRESETS: PresetProvider[] = [
   {
-    name: 'Dattio / Custom Proxy',
-    baseUrl: 'https://api.dattio.com/v1',
-    defaultModel: 'deepseek-chat',
-    description: 'Endpoint pihak ketiga / reseller / proxy',
+    name: 'OpenAI Official',
+    baseUrl: 'https://api.openai.com/v1',
+    defaultModel: 'gpt-4o',
+    description: 'Native upstream OpenAI API',
   },
   {
     name: 'DeepSeek Official',
     baseUrl: 'https://api.deepseek.com/v1',
     defaultModel: 'deepseek-chat',
     description: 'Native upstream DeepSeek API',
-  },
-  {
-    name: 'OpenAI Official',
-    baseUrl: 'https://api.openai.com/v1',
-    defaultModel: 'gpt-4o',
-    description: 'Native upstream OpenAI API',
   },
   {
     name: 'OpenRouter',
@@ -41,7 +35,7 @@ const PRESETS: PresetProvider[] = [
     description: 'Ultra-fast LPU inference',
   },
   {
-    name: 'Ollama / Local (localhost:11434)',
+    name: 'Ollama Local (localhost:11434)',
     baseUrl: 'http://localhost:11434/v1',
     defaultModel: 'llama3',
     description: 'Inference lokal mesin Anda',
@@ -55,7 +49,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
   isRunning,
 }) => {
   const [showKey, setShowKey] = useState(false);
-  const [activePreset, setActivePreset] = useState<string>('Dattio / Custom Proxy');
+  const [activePreset, setActivePreset] = useState<string>('');
 
   const handlePresetSelect = (preset: PresetProvider) => {
     setActivePreset(preset.name);
@@ -118,7 +112,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
             type="text"
             value={config.baseUrl}
             onChange={(e) => onChange({ ...config, baseUrl: e.target.value })}
-            placeholder="https://api.dattio.com/v1"
+            placeholder="https://api.xyz.com/v1"
             className="w-full bg-[#0b0f17] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono transition"
           />
         </div>
@@ -160,7 +154,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
             type="text"
             value={config.model}
             onChange={(e) => onChange({ ...config, model: e.target.value })}
-            placeholder="deepseek-chat / gpt-4o"
+            placeholder="misal: gpt-4o, deepseek-chat"
             className="w-full bg-[#0b0f17] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono transition"
           />
         </div>

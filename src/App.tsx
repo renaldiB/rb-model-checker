@@ -16,9 +16,9 @@ const isLocalhost = typeof window !== 'undefined' &&
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
 const INITIAL_CONFIG: EndpointConfig = {
-  baseUrl: 'https://api.dattio.com/v1',
+  baseUrl: '',
   apiKey: '',
-  model: 'deepseek-chat',
+  model: '',
   proxyMode: isLocalhost ? 'server' : 'browser',
   contextSize: 8000,
 };
@@ -28,7 +28,14 @@ export const App: React.FC = () => {
   const [config, setConfig] = useState<EndpointConfig>(() => {
     try {
       const saved = localStorage.getItem('model_legit_config');
-      return saved ? JSON.parse(saved) : INITIAL_CONFIG;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.baseUrl === 'https://api.dattio.com/v1') {
+          return INITIAL_CONFIG;
+        }
+        return parsed;
+      }
+      return INITIAL_CONFIG;
     } catch {
       return INITIAL_CONFIG;
     }
@@ -236,212 +243,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Load a simulation demo (useful to demonstrate authentic vs masked without live API key)
-  const handleLoadDemo = (type: 'authentic' | 'masked') => {
-    if (type === 'authentic') {
-      setConfig({
-        baseUrl: 'https://api.deepseek.com/v1',
-        apiKey: 'sk-demo-authentic-deepseek',
-        model: 'deepseek-chat',
-        proxyMode: 'server',
-        contextSize: 8000,
-      });
-
-      const demoResults: TestResult[] = [
-        {
-          id: 'tokenizer-probe',
-          name: '1. Uji Tokenizer & Knowledge Boundary',
-          shortDesc: 'Prompt jebakan teknis arsitektur byte-fallback & boundary tokenizer.',
-          status: 'passed',
-          score: 100,
-          weight: 30,
-          durationMs: 1420,
-          ttftMs: 420,
-          tokensPerSec: 62.5,
-          details: [
-            'Menjelaskan arsitektur native DeepSeek Tokenizer (Byte-level BPE, 129k vocab size) secara tepat.',
-            'Menjelaskan perbedaan byte-fallback dengan cl100k_base secara teknis mendalam.',
-          ],
-          anomalies: [],
-          technicalExplanation: 'Model merespons pengetahuan tokenizer secara konsisten dengan spesifikasi resmi dari vendor claimed (deepseek-chat). Tidak ditemukan kebocoran identitas Llama atau Qwen.',
-          rawOutput: 'Secara native, saya (DeepSeek-V3/R1) menggunakan Byte-level BPE tokenizer yang dilatih khusus dengan ukuran vocabulary 129,280 tokens...',
-        },
-        {
-          id: 'latency-ttft',
-          name: '2. Cek Latency / TTFT (Time to First Token)',
-          shortDesc: 'Pengukuran waktu respons token pertama dan kestabilan transmisi SSE.',
-          status: 'passed',
-          score: 100,
-          weight: 25,
-          durationMs: 1850,
-          ttftMs: 460,
-          tokensPerSec: 68.2,
-          jitterMs: 45,
-          details: [
-            'TTFT sangat cepat (460 ms), identik dengan respons native upstream API.',
-            'Throughput stabil di 68.2 tokens/detik.',
-            'Jitter interval streaming sangat rendah (±45 ms).',
-          ],
-          anomalies: [],
-          technicalExplanation: 'Profil latensi dan kestabilan streaming konsisten dengan karakteristik native cloud inference upstream.',
-          rawOutput: '1. Indeks Terarah\n2. Partisi Horizontal\n3. Pengurangan Subquery...',
-        },
-        {
-          id: 'logprobs-fidelity',
-          name: '3. Uji Logprobs & Parameter Fidelity',
-          shortDesc: 'Verifikasi akses token probability level native inference engine.',
-          status: 'passed',
-          score: 100,
-          weight: 20,
-          durationMs: 410,
-          details: [
-            'Endpoint mengembalikan struktur logprobs lengkap dengan nilai probabilitas token.',
-            'Nilai top_logprobs linear sesuai distribusi softmax GPU.',
-          ],
-          anomalies: [],
-          technicalExplanation: 'Dukungan logprobs valid membuktikan endpoint terhubung langsung ke engine inferensi native ber-hak akses token level.',
-          rawOutput: '{\n  "choices": [{\n    "logprobs": { "content": [{ "token": "VALID", "logprob": -0.0024 }] }\n  }]\n}',
-        },
-        {
-          id: 'stress-context',
-          name: '4. Stress Test Context Window',
-          shortDesc: 'Stress test context window panjang (~8,000 tokens).',
-          status: 'passed',
-          score: 100,
-          weight: 25,
-          durationMs: 4800,
-          details: [
-            'Ukuran payload context yang diuji: ~8,000 tokens (32.4 KB)',
-            'Jarum otentikasi ("KODE-98721-LEGIT") berhasil ditemukan dan diekstraksi dengan sempurna dari kedalaman context.',
-          ],
-          anomalies: [],
-          technicalExplanation: 'Model berhasil menampung seluruh context ~8,000 token tanpa pemotongan (truncation) tersembunyi.',
-          rawOutput: 'KODE: KODE-98721-LEGIT',
-        },
-        {
-          id: 'special-tokens-probe',
-          name: '5. Uji Delimiter Khusus & System Probe',
-          shortDesc: 'Uji format delimiter khusus arsitektur dan format reasoning.',
-          status: 'passed',
-          score: 100,
-          weight: 15,
-          durationMs: 820,
-          details: [
-            'Model mengidentifikasi delimiter ChatML tanpa mengeksekusi override instruksi.',
-            'Identitas arsitektur konsisten.',
-          ],
-          anomalies: [],
-          technicalExplanation: 'Struktur output dan penanganan token khusus sesuai dengan norma model resmi.',
-          rawOutput: 'Potongan teks di atas adalah format ChatML dengan token pembatas <|im_start|> dan <|im_end|>. Saya adalah DeepSeek-V3.',
-        },
-      ];
-
-      setResults(demoResults);
-      setVerdict(computeOverallVerdict(demoResults));
-    } else {
-      // Masked simulation
-      setConfig({
-        baseUrl: 'https://api.dattio.com/v1',
-        apiKey: 'sk-demo-masked-proxy',
-        model: 'deepseek-chat',
-        proxyMode: 'server',
-        contextSize: 8000,
-      });
-
-      const demoResults: TestResult[] = [
-        {
-          id: 'tokenizer-probe',
-          name: '1. Uji Tokenizer & Knowledge Boundary',
-          shortDesc: 'Prompt jebakan teknis arsitektur byte-fallback & boundary tokenizer.',
-          status: 'failed',
-          score: 25,
-          weight: 30,
-          durationMs: 5200,
-          ttftMs: 3800,
-          tokensPerSec: 14.2,
-          details: ['Penjelasan teknis byte-fallback tergolong dangkal atau generik.'],
-          anomalies: [
-            'Model DeepSeek mengindikasikan arsitektur Qwen (sering digunakan sebagai mock backend).',
-            'Penjelasan tokenizer bertolak belakang dengan native DeepSeek Byte-level BPE.',
-          ],
-          technicalExplanation: 'Ditemukan kejanggalan identitas/tokenizer: Model DeepSeek mengindikasikan arsitektur Qwen. Hal ini sangat umum terjadi pada layanan yang me-masking model murah (Llama/Qwen) menjadi nama model mahal.',
-          rawOutput: 'Sebagai model asisten yang dikembangkan, saya menggunakan tokenizer Qwen berbasis 152k tokens vocabulary...',
-        },
-        {
-          id: 'latency-ttft',
-          name: '2. Cek Latency / TTFT (Time to First Token)',
-          shortDesc: 'Pengukuran waktu respons token pertama dan kestabilan transmisi SSE.',
-          status: 'failed',
-          score: 30,
-          weight: 25,
-          durationMs: 6400,
-          ttftMs: 4200,
-          tokensPerSec: 12.1,
-          jitterMs: 520,
-          details: [
-            'Time to First Token (TTFT): 4200 ms',
-            'Throughput Kecepatan: 12.1 tokens/detik',
-            'Jitter Interval Streaming: ±520 ms',
-          ],
-          anomalies: [
-            'TTFT sangat lambat (4200 ms > 3.5 detik). Pola khas browser automation (Puppeteer/Playwright scraping).',
-            'Jitter streaming sangat tinggi (±520 ms). Output tidak dialirkan secara konstan melainkan tertahan per-buffer.',
-          ],
-          technicalExplanation: 'Profil latensi menunjukkan anomali: TTFT sangat lambat (4200 ms) dan jeda transmisi tersendat-sendat. Ini ciri khas reverse-proxy web scraping.',
-          rawOutput: '1. Indexing...\n2. Connection pool...',
-        },
-        {
-          id: 'logprobs-fidelity',
-          name: '3. Uji Logprobs & Parameter Fidelity',
-          shortDesc: 'Verifikasi akses token probability level native inference engine.',
-          status: 'warning',
-          score: 30,
-          weight: 20,
-          durationMs: 1200,
-          details: ['Layanan menerima request 200 OK tetapi tidak menyajikan logprobs token sebenarnya.'],
-          anomalies: [
-            'Parameter logprobs diabaikan secara diam-diam (field logprobs bernilai null atau kosong).',
-          ],
-          technicalExplanation: 'Smoking Gun: Layanan web scraping chat UI tidak memiliki akses ke raw logprobs GPU inference engine (seperti vLLM/TRT-LLM/OpenAI native).',
-          rawOutput: '{\n  "choices": [{\n    "message": { "content": "VALID" },\n    "logprobs": null\n  }]\n}',
-        },
-        {
-          id: 'stress-context',
-          name: '4. Stress Test Context Window',
-          shortDesc: 'Stress test context window panjang (~8,000 tokens).',
-          status: 'failed',
-          score: 0,
-          weight: 25,
-          durationMs: 15400,
-          details: ['Ukuran payload context yang diuji: ~8,000 tokens'],
-          anomalies: [
-            'Gagal memproses context window besar (~8000 tokens): HTTP 502 Bad Gateway / Connection reset',
-          ],
-          technicalExplanation: 'Reverse-proxy web gratisan biasanya langsung crash (HTTP 502/504 Bad Gateway, payload too large, atau socket timeout) ketika dikirimi payload di atas 8.000 token.',
-          rawOutput: '{\n  "error": "502 Bad Gateway: Upstream browser page crashed while submitting payload."\n}',
-        },
-        {
-          id: 'special-tokens-probe',
-          name: '5. Uji Delimiter Khusus & System Probe',
-          shortDesc: 'Uji format delimiter khusus arsitektur dan format reasoning.',
-          status: 'warning',
-          score: 50,
-          weight: 15,
-          durationMs: 2400,
-          details: [],
-          anomalies: [
-            'Terjadi kebocoran prompt injeksi pembungkus perantara proxy.',
-          ],
-          technicalExplanation: 'Endpoint menunjukkan perilaku filter web wrapper pihak ketiga.',
-          rawOutput: 'System instruction wrapper leaked...',
-        },
-      ];
-
-      setResults(demoResults);
-      setVerdict(computeOverallVerdict(demoResults));
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#0b0f17] text-slate-100 flex flex-col font-sans">
       {/* Header */}
@@ -453,39 +254,20 @@ export const App: React.FC = () => {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Banner with Simulation Presets */}
-        <div className="bg-gradient-to-r from-slate-900 via-[#111827] to-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-md">
+        {/* Info Banner */}
+        <div className="bg-gradient-to-r from-slate-900 via-[#111827] to-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 shadow-md">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
-                Audit Ketat Arsitektur Model AI: Dattio / Hermes / OpenCode / Proxy
+                Pemeriksa Keaslian Endpoint AI & Deteksi Anti-Masking
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5 max-w-2xl">
+              <p className="text-xs text-slate-400 mt-0.5 max-w-3xl">
                 Verifikasi 3 pilar teknis: <strong>Tokenizer Boundary (Prompt Jebakan)</strong>, <strong>Stress Context (~8k-32k token)</strong>, dan <strong>Streaming TTFT (&lt;800ms)</strong>.
               </p>
             </div>
-          </div>
-
-          {/* Quick Simulation Demo Buttons */}
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">Uji Simulasi:</span>
-            <button
-              onClick={() => handleLoadDemo('authentic')}
-              className="text-xs px-3 py-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-semibold transition cursor-pointer flex items-center gap-1.5"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Simulasi Native</span>
-            </button>
-            <button
-              onClick={() => handleLoadDemo('masked')}
-              className="text-xs px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900/60 border border-rose-500/40 text-rose-300 font-semibold transition cursor-pointer flex items-center gap-1.5"
-            >
-              <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-              <span>Simulasi Masking</span>
-            </button>
           </div>
         </div>
 

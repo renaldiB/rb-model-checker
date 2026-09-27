@@ -42,6 +42,19 @@ const PRESETS: PresetProvider[] = [
   },
 ];
 
+const getMissingPrefixSuggestion = (baseUrl: string, model: string): string | null => {
+  if (!baseUrl.includes('openrouter.ai') || !model.trim() || model.includes('/')) return null;
+  const lower = model.toLowerCase().trim();
+  if (lower.startsWith('deepseek')) return `deepseek/${model.trim()}`;
+  if (lower.startsWith('llama') || lower.includes('llama')) return `meta-llama/${model.trim()}`;
+  if (lower.startsWith('gpt') || lower.startsWith('o1') || lower.startsWith('o3')) return `openai/${model.trim()}`;
+  if (lower.startsWith('claude')) return `anthropic/${model.trim()}`;
+  if (lower.startsWith('qwen')) return `qwen/${model.trim()}`;
+  if (lower.startsWith('gemini')) return `google/${model.trim()}`;
+  if (lower.startsWith('mistral')) return `mistralai/${model.trim()}`;
+  return `vendor/${model.trim()}`;
+};
+
 export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
   config,
   onChange,
@@ -51,7 +64,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
   const [showKey, setShowKey] = useState(false);
   const [activePreset, setActivePreset] = useState<string>('');
   const [copiedUrl, setCopiedUrl] = useState(false);
-  const [activeTooltip, setActiveTooltip] = useState<'context' | 'protocol' | null>(null);
+  const [activeTooltip, setActiveTooltip] = useState<'context' | 'protocol' | 'model' | null>(null);
 
   // Close tooltips on outside click or Esc
   useEffect(() => {
@@ -201,21 +214,67 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
         </div>
 
         {/* Model Identifier */}
-        <div className="md:col-span-3 flex flex-col gap-1.5">
+        <div className="md:col-span-3 flex flex-col gap-1.5 relative tooltip-container">
           <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
-            <span className="font-semibold uppercase tracking-wider">MODEL IDENTIFIER</span>
-            <span className="text-[10px] text-[#bbcabf]">PARAM TAG</span>
+            <span className="flex items-center gap-1 font-semibold uppercase tracking-wider">
+              MODEL IDENTIFIER
+              <button
+                type="button"
+                onClick={() => setActiveTooltip(activeTooltip === 'model' ? null : 'model')}
+                className={`p-0.5 rounded transition cursor-pointer ${
+                  activeTooltip === 'model' ? 'text-[#4cd7f6] bg-[#4cd7f6]/10' : 'text-[#86948a] hover:text-[#4cd7f6]'
+                }`}
+                title="Panduan Format Penulisan Nama Model"
+                aria-label="Info Format Model"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+              </button>
+            </span>
+            <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${config.baseUrl.includes('openrouter.ai') ? 'bg-[#4cd7f6]/15 text-[#4cd7f6] border border-[#4cd7f6]/30' : 'text-[#bbcabf]'}`}>
+              {config.baseUrl.includes('openrouter.ai') ? 'VENDOR/MODEL' : 'PARAM TAG'}
+            </span>
           </label>
+
+          {/* Model Format Help Popover */}
+          {activeTooltip === 'model' && (
+            <div className="absolute bottom-full mb-2 right-0 sm:left-0 sm:right-auto w-72 sm:w-80 p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2 animate-fade-in text-[#dfe2ee]">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+                <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
+                  <BookOpen className="w-3 h-3" />
+                  Format Nama Model
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveTooltip(null)}
+                  className="text-[#86948a] hover:text-[#dfe2ee] p-0.5 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="space-y-1.5 text-[11px] text-[#bbcabf]">
+                <p>
+                  <strong className="text-[#4edea3]">API Resmi (OpenAI / DeepSeek / Groq):</strong><br />
+                  Tulis nama model <em>tanpa garis miring</em>. Contoh: <code className="text-[#dfe2ee]">deepseek-chat</code>, <code className="text-[#dfe2ee]">gpt-4o</code>.
+                </p>
+                <p>
+                  <strong className="text-[#4cd7f6]">Aggregator (OpenRouter):</strong><br />
+                  Wajib menyertakan namespace vendor dengan garis miring. Contoh: <code className="text-[#dfe2ee]">deepseek/deepseek-chat</code>, <code className="text-[#dfe2ee]">openai/gpt-4o</code>.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="relative flex items-center">
             <input
               type="text"
               value={config.model}
               onChange={(e) => onChange({ ...config, model: e.target.value })}
-              placeholder="misal: gpt-4o, deepseek-chat"
+              placeholder={config.baseUrl.includes('openrouter.ai') ? 'misal: deepseek/deepseek-chat' : 'misal: gpt-4o, deepseek-chat'}
               className="w-full bg-[#0a0e16]/90 border border-white/[0.1] rounded-xl px-4 py-2.5 text-[#dfe2ee] font-mono text-xs focus:border-[#4cd7f6] focus:ring-1 focus:ring-[#4cd7f6]/50 outline-none transition-all"
             />
           </div>
-          {/* Smart suggestion chip if vendor prefix detected on non-OpenRouter endpoint */}
+
+          {/* Skenario 1: Prefix tidak diperlukan pada endpoint resmi (misal: deepseek/deepseek-v4.1-flash di api.deepseek.com) */}
           {config.model.includes('/') && !config.baseUrl.includes('openrouter.ai') && (
             <button
               type="button"
@@ -223,7 +282,25 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
               className="text-[10px] text-[#f59e0b] hover:text-[#fbbf24] text-left font-mono flex items-center gap-1 transition cursor-pointer pt-0.5"
               title="Klik untuk menghapus prefix vendor otomatis"
             >
-              <span>⚠️ Prefix vendor terdeteksi. Ubah jadi: <u>{config.model.split('/').pop()}</u>?</span>
+              <span>⚠️ Prefix tidak diperlukan. Ubah jadi: <u>{config.model.split('/').pop()}</u>?</span>
+            </button>
+          )}
+
+          {/* Skenario 2: Kurang prefix pada OpenRouter (misal: deepseek-v4.1-flash padahal butuh deepseek/deepseek-v4.1-flash) */}
+          {config.baseUrl.includes('openrouter.ai') && !config.model.includes('/') && config.model.trim().length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                const suggestion = getMissingPrefixSuggestion(config.baseUrl, config.model) || `vendor/${config.model.trim()}`;
+                onChange({ ...config, model: suggestion });
+              }}
+              className="text-[10px] text-[#4cd7f6] hover:text-[#7ee7fc] text-left font-mono flex items-center gap-1 transition cursor-pointer pt-0.5"
+              title="Klik untuk menambahkan prefix vendor OpenRouter"
+            >
+              <span>
+                💡 OpenRouter butuh prefix vendor. Ubah jadi:{' '}
+                <u>{getMissingPrefixSuggestion(config.baseUrl, config.model) || `vendor/${config.model.trim()}`}</u>?
+              </span>
             </button>
           )}
         </div>

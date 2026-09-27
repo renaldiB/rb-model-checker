@@ -20,6 +20,24 @@ export interface TestDefinition {
   ) => Promise<TestResult>;
 }
 
+export function formatModelErrorHint(baseUrl: string, model: string): string | null {
+  if (baseUrl.includes('openrouter.ai') && !model.includes('/')) {
+    const trimmed = model.trim().toLowerCase();
+    let prefix = 'vendor';
+    if (trimmed.startsWith('deepseek')) prefix = 'deepseek';
+    else if (trimmed.startsWith('llama') || trimmed.includes('llama')) prefix = 'meta-llama';
+    else if (trimmed.startsWith('gpt') || trimmed.startsWith('o1') || trimmed.startsWith('o3')) prefix = 'openai';
+    else if (trimmed.startsWith('claude')) prefix = 'anthropic';
+    else if (trimmed.startsWith('qwen')) prefix = 'qwen';
+    return `Petunjuk Format: OpenRouter mewajibkan penulisan namespace vendor dengan garis miring. Coba gunakan '${prefix}/${model.trim()}'.`;
+  }
+  if (!baseUrl.includes('openrouter.ai') && model.includes('/')) {
+    const clean = model.split('/').pop() || model;
+    return `Petunjuk Format: Endpoint resmi ini kemungkinan tidak menerima prefix vendor '/'. Coba gunakan '${clean}'.`;
+  }
+  return null;
+}
+
 export const TEST_SUITE: TestDefinition[] = [
   {
     id: 'tokenizer-probe',
@@ -72,6 +90,10 @@ export const TEST_SUITE: TestDefinition[] = [
               });
             },
             onError: (err) => {
+              const modelHint = formatModelErrorHint(config.baseUrl, config.model);
+              const anomalies = ['Endpoint menolak atau error saat pengujian prompt teknis.'];
+              if (modelHint) anomalies.push(modelHint);
+
               resolve({
                 id: 'tokenizer-probe',
                 name: '1. Uji Tokenizer & Knowledge Boundary',
@@ -81,8 +103,8 @@ export const TEST_SUITE: TestDefinition[] = [
                 weight: 30,
                 durationMs: err.durationMs,
                 details: [`Gagal berkomunikasi dengan endpoint: ${err.message}`],
-                anomalies: ['Endpoint menolak atau error saat pengujian prompt teknis.'],
-                technicalExplanation: 'Endpoint gagal memproses prompt evaluasi teknis dasar.',
+                anomalies,
+                technicalExplanation: modelHint || 'Endpoint gagal memproses prompt evaluasi teknis dasar.',
                 rawOutput: err.raw,
                 timestamp: Date.now(),
               });
@@ -145,6 +167,9 @@ export const TEST_SUITE: TestDefinition[] = [
             },
             onError: (err) => {
               const evalRes = evaluateTtftTest(0, 0, 0, err.message);
+              const modelHint = formatModelErrorHint(config.baseUrl, config.model);
+              if (modelHint) evalRes.anomalies.push(modelHint);
+
               resolve({
                 id: 'latency-ttft',
                 name: '2. Cek Latency / TTFT (Time to First Token)',
@@ -155,7 +180,7 @@ export const TEST_SUITE: TestDefinition[] = [
                 durationMs: err.durationMs,
                 details: evalRes.details,
                 anomalies: evalRes.anomalies,
-                technicalExplanation: evalRes.technicalExplanation,
+                technicalExplanation: modelHint || evalRes.technicalExplanation,
                 rawOutput: err.raw,
                 timestamp: Date.now(),
               });
@@ -183,6 +208,10 @@ export const TEST_SUITE: TestDefinition[] = [
       });
 
       const evalRes = evaluateLogprobsTest(result);
+      if (!result.ok) {
+        const modelHint = formatModelErrorHint(config.baseUrl, config.model);
+        if (modelHint) evalRes.anomalies.push(modelHint);
+      }
       const answer = result.data?.choices?.[0]?.message?.content || JSON.stringify(result.data);
 
       return {
@@ -224,6 +253,9 @@ export const TEST_SUITE: TestDefinition[] = [
       if (!res.ok) {
         const errorMsg = res.data?.error?.message || res.data?.error || `HTTP ${res.status}`;
         const evalRes = evaluateContextTest('', needle, targetTokens, res.durationMs, errorMsg);
+        const modelHint = formatModelErrorHint(config.baseUrl, config.model);
+        if (modelHint) evalRes.anomalies.push(modelHint);
+
         return {
           id: 'stress-context',
           name: '4. Stress Test Context Window',
@@ -234,7 +266,7 @@ export const TEST_SUITE: TestDefinition[] = [
           durationMs: res.durationMs,
           details: evalRes.details,
           anomalies: evalRes.anomalies,
-          technicalExplanation: evalRes.technicalExplanation,
+          technicalExplanation: modelHint || evalRes.technicalExplanation,
           rawOutput: JSON.stringify(res.data, null, 2),
           timestamp: Date.now(),
         };

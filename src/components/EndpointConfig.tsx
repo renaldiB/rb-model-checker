@@ -154,10 +154,10 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
         </div>
       </div>
 
-      {/* 3-Column Input Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+      {/* 3-Column Input Grid: 1 col on mobile, 2 cols on tablet, 12 cols on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-5">
         {/* Base URL */}
-        <div className="md:col-span-5 flex flex-col gap-1.5">
+        <div className="md:col-span-2 lg:col-span-5 flex flex-col gap-1.5">
           <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
             <span className="font-semibold uppercase tracking-wider">ENDPOINT BASE URL</span>
             <span className="text-[#4cd7f6] text-[10px] px-2 py-0.5 rounded-full bg-[#4cd7f6]/10 border border-[#4cd7f6]/20 font-mono">
@@ -184,7 +184,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
         </div>
 
         {/* API Key */}
-        <div className="md:col-span-4 flex flex-col gap-1.5">
+        <div className="md:col-span-1 lg:col-span-4 flex flex-col gap-1.5">
           <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
             <span className="flex items-center gap-1 font-semibold uppercase tracking-wider">
               <Key className="w-3 h-3 text-[#86948a]" />
@@ -214,7 +214,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
         </div>
 
         {/* Model Identifier */}
-        <div className="md:col-span-3 flex flex-col gap-1.5 relative tooltip-container">
+        <div className="md:col-span-1 lg:col-span-3 flex flex-col gap-1.5 relative tooltip-container">
           <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
             <span className="flex items-center gap-1 font-semibold uppercase tracking-wider">
               MODEL IDENTIFIER
@@ -237,7 +237,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
 
           {/* Model Format Help Popover */}
           {activeTooltip === 'model' && (
-            <div className="absolute bottom-full mb-2 right-0 sm:left-0 sm:right-auto w-72 sm:w-80 p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2 animate-fade-in text-[#dfe2ee]">
+            <div className="absolute bottom-full mb-2 right-0 sm:left-0 sm:right-auto w-[calc(100vw-3rem)] sm:w-80 max-w-sm p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2 animate-fade-in text-[#dfe2ee]">
               <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
                 <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
                   <BookOpen className="w-3 h-3" />
@@ -330,7 +330,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
 
             {/* Context Stress Popover */}
             {activeTooltip === 'context' && (
-              <div className="absolute bottom-full mb-2.5 left-0 sm:left-auto w-72 sm:w-84 p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-[#dfe2ee]">
+              <div className="absolute bottom-full mb-2.5 left-0 sm:left-auto w-[calc(100vw-3rem)] sm:w-84 max-w-sm p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-[#dfe2ee]">
                 <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
                   <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
                     <BookOpen className="w-3 h-3" />
@@ -398,7 +398,7 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
 
             {/* Protocol Popover */}
             {activeTooltip === 'protocol' && (
-              <div className="absolute bottom-full mb-2.5 right-0 sm:left-0 sm:right-auto w-72 sm:w-84 p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-[#dfe2ee]">
+              <div className="absolute bottom-full mb-2.5 right-0 sm:left-0 sm:right-auto w-[calc(100vw-3rem)] sm:w-84 max-w-sm p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-[#dfe2ee]">
                 <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
                   <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
                     <BookOpen className="w-3 h-3" />

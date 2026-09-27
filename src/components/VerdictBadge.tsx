@@ -220,11 +220,11 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
           )}
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-3 pt-2 w-full">
             <button
               type="button"
               onClick={onExport}
-              className="px-4 py-2.5 rounded-xl bg-[#262a33] hover:bg-[#31353e] text-[#dfe2ee] font-mono text-xs font-semibold border border-white/[0.1] flex items-center gap-2 transition cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#262a33] hover:bg-[#31353e] text-[#dfe2ee] font-mono text-xs font-semibold border border-white/[0.1] flex items-center justify-center gap-2 transition cursor-pointer"
             >
               <Download className="w-4 h-4 text-[#4cd7f6]" />
               <span>Ekspor Laporan Audit (JSON / MD)</span>
@@ -233,7 +233,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
             <button
               type="button"
               onClick={handleShareAttestation}
-              className="px-4 py-2.5 rounded-xl bg-[#1c2028] hover:bg-[#262a33] text-[#4cd7f6] font-mono text-xs font-semibold border border-[#4cd7f6]/30 flex items-center gap-2 transition cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#1c2028] hover:bg-[#262a33] text-[#4cd7f6] font-mono text-xs font-semibold border border-[#4cd7f6]/30 flex items-center justify-center gap-2 transition cursor-pointer"
             >
               {copiedShare ? <Check className="w-4 h-4 text-[#4edea3]" /> : <Share2 className="w-4 h-4" />}
               <span>{copiedShare ? 'Tersalin!' : 'Bagikan Hasil Audit'}</span>

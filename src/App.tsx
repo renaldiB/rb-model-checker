@@ -262,21 +262,21 @@ export const App: React.FC = () => {
       />
 
       {/* Main Container */}
-      <main className="flex-1 w-full max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+      <main className="flex-1 w-full max-w-[1520px] mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-5 sm:space-y-8">
         {/* Operational Status & Headline Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-white/[0.08] pb-6">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-5 border-b border-white/[0.08] pb-5 sm:pb-6">
           <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#4edea3]/10 border border-[#4edea3]/30 text-[#4edea3] font-mono text-xs">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/30 text-[#4edea3] font-mono text-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] animate-pulse" />
                 ACTIVE TELEMETRY SENSOR // NODE #04
               </span>
-              <span className="text-[#bbcabf] font-mono text-xs">
+              <span className="text-[#bbcabf] font-mono text-[11px] sm:text-xs">
                 ENCLAVE: TLS 1.3 SECURED
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-[#dfe2ee]">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-[#dfe2ee] leading-tight">
               AI Endpoint Authenticity &amp; Anti-Masking Radar
             </h1>
 
@@ -286,18 +286,18 @@ export const App: React.FC = () => {
           </div>
 
           {/* Quick Action Stats Strip */}
-          <div className="flex items-center gap-4 bg-[#181c24]/80 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/[0.08] font-mono shrink-0">
-            <div className="space-y-0.5 pr-4 border-r border-white/[0.08]">
-              <div className="text-[10px] text-[#bbcabf] uppercase">INSPECTION ENGINE</div>
-              <div className="text-xs text-[#4cd7f6] font-bold">v4.2.8-FORENSIC</div>
+          <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 sm:gap-4 bg-[#181c24]/80 backdrop-blur-md p-3 sm:px-4 sm:py-2.5 rounded-xl border border-white/[0.08] font-mono w-full sm:w-auto shrink-0">
+            <div className="space-y-0.5 pr-2 sm:pr-4 border-r border-white/[0.08] text-center sm:text-left">
+              <div className="text-[9px] sm:text-[10px] text-[#bbcabf] uppercase tracking-tight">INSPECTION ENGINE</div>
+              <div className="text-[11px] sm:text-xs text-[#4cd7f6] font-bold truncate">v4.2.8-FORENSIC</div>
             </div>
-            <div className="space-y-0.5 pr-4 border-r border-white/[0.08]">
-              <div className="text-[10px] text-[#bbcabf] uppercase">ENTROPY TOLERANCE</div>
-              <div className="text-xs text-[#4edea3] font-bold">±0.012 nats</div>
+            <div className="space-y-0.5 px-1 sm:px-0 sm:pr-4 border-r border-white/[0.08] text-center sm:text-left">
+              <div className="text-[9px] sm:text-[10px] text-[#bbcabf] uppercase tracking-tight">ENTROPY TOLERANCE</div>
+              <div className="text-[11px] sm:text-xs text-[#4edea3] font-bold">±0.012 nats</div>
             </div>
-            <div className="space-y-0.5">
-              <div className="text-[10px] text-[#bbcabf] uppercase">REPLAY GUARD</div>
-              <div className="text-xs text-[#10b981] font-bold">ARMED</div>
+            <div className="space-y-0.5 pl-1 sm:pl-0 text-center sm:text-left">
+              <div className="text-[9px] sm:text-[10px] text-[#bbcabf] uppercase tracking-tight">REPLAY GUARD</div>
+              <div className="text-[11px] sm:text-xs text-[#10b981] font-bold">ARMED</div>
             </div>
           </div>
         </div>

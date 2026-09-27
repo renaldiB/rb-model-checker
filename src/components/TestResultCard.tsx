@@ -216,7 +216,7 @@ export const TestResultCard: React.FC<TestResultCardProps> = ({
           type="button"
           onClick={() => onRunSingle(result.id)}
           disabled={isRunning}
-          className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#4cd7f6] hover:text-[#e0f7fe] px-3.5 py-1.5 rounded-lg bg-[#4cd7f6]/10 hover:bg-[#4cd7f6]/20 border border-[#4cd7f6]/40 hover:border-[#4cd7f6]/70 shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_16px_rgba(6,182,212,0.3)] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex items-center justify-center gap-1.5 font-mono text-xs font-semibold text-[#4cd7f6] hover:text-[#e0f7fe] px-3.5 py-1.5 rounded-lg bg-[#4cd7f6]/10 hover:bg-[#4cd7f6]/20 border border-[#4cd7f6]/40 hover:border-[#4cd7f6]/70 shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_16px_rgba(6,182,212,0.3)] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed w-full sm:w-auto"
         >
           <RefreshCw className="w-3 h-3 text-[#4cd7f6]" />
           <span>Uji Modul Ini Saja</span>

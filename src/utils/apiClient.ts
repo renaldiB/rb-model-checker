@@ -298,8 +298,22 @@ export async function executeStreamRequest(
     if (!res.ok) {
       clearTimeout(timer);
       const rawText = await res.text();
+      let errDetail = `HTTP ${res.status}: ${res.statusText}`;
+      try {
+        const parsed = JSON.parse(rawText);
+        if (parsed?.error?.message) {
+          errDetail = parsed.error.message;
+        } else if (typeof parsed?.error === 'string') {
+          errDetail = parsed.error;
+        } else if (parsed?.message) {
+          errDetail = parsed.message;
+        }
+      } catch {
+        // Fallback to HTTP status text
+      }
+
       callbacks.onError?.({
-        message: `HTTP ${res.status}: ${res.statusText}`,
+        message: errDetail,
         durationMs: Math.round(performance.now() - startTime),
         status: res.status,
         raw: rawText,

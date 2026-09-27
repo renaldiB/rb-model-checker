@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Play, Server, Globe, Key, Copy, Check, Radar, Layers, HelpCircle, X, BookOpen } from 'lucide-react';
+import { Eye, EyeOff, Play, Server, Globe, Key, Copy, Check, Radar, Layers, HelpCircle, X, BookOpen, AlertTriangle } from 'lucide-react';
 import { EndpointConfig, PresetProvider } from '../types';
 
 interface EndpointConfigProps {
@@ -215,6 +215,17 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
               className="w-full bg-[#0a0e16]/90 border border-white/[0.1] rounded-xl px-4 py-2.5 text-[#dfe2ee] font-mono text-xs focus:border-[#4cd7f6] focus:ring-1 focus:ring-[#4cd7f6]/50 outline-none transition-all"
             />
           </div>
+          {/* Smart suggestion chip if vendor prefix detected on non-OpenRouter endpoint */}
+          {config.model.includes('/') && !config.baseUrl.includes('openrouter.ai') && (
+            <button
+              type="button"
+              onClick={() => onChange({ ...config, model: config.model.split('/').pop() || config.model })}
+              className="text-[10px] text-[#f59e0b] hover:text-[#fbbf24] text-left font-mono flex items-center gap-1 transition cursor-pointer pt-0.5"
+              title="Klik untuk menghapus prefix vendor otomatis"
+            >
+              <span>⚠️ Prefix vendor terdeteksi. Ubah jadi: <u>{config.model.split('/').pop()}</u>?</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -400,6 +411,19 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
               </>
             )}
           </button>
+        </div>
+      </div>
+
+      {/* Token Quota / Balance Warning Banner */}
+      <div className="flex items-start sm:items-center gap-2.5 px-4 py-3 rounded-xl bg-[#f59e0b]/10 border border-[#f59e0b]/30 text-[#f59e0b] text-xs font-mono">
+        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 sm:mt-0 text-[#f59e0b]" />
+        <div className="flex-1 leading-relaxed text-[11px] text-[#dfe2ee]">
+          <strong className="text-[#f59e0b] uppercase tracking-wide mr-1.5">
+            Perhatian: Penggunaan Kuota &amp; Saldo Token:
+          </strong>
+          Tindakan ini mengirimkan request uji nyata ke server AI Anda (termasuk injeksi{' '}
+          <strong className="text-[#4cd7f6]">{config.contextSize / 1000}k token</strong> pada stress test context window).{' '}
+          Tindakan ini <strong className="text-[#f59e0b]">akan memotong kuota token / saldo billing aktif</strong> pada API Key yang Anda pasang.
         </div>
       </div>
     </section>

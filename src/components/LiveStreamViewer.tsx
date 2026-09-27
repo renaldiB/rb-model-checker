@@ -25,9 +25,17 @@ export const LiveStreamViewer: React.FC<LiveStreamViewerProps> = ({
   const terminalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let animId: number;
     if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+      animId = requestAnimationFrame(() => {
+        if (terminalRef.current) {
+          terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+        }
+      });
     }
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+    };
   }, [streamText, statusMessage]);
 
   if (!isVisible && !streamText) return null;

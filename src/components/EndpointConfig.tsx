@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Play, Server, Globe, Key, Copy, Check, Radar, Layers } from 'lucide-react';
+import { Eye, EyeOff, Play, Server, Globe, Key, Copy, Check, Radar, Layers, HelpCircle, X, BookOpen } from 'lucide-react';
 import { EndpointConfig, PresetProvider } from '../types';
 
 interface EndpointConfigProps {
@@ -51,6 +51,27 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
   const [showKey, setShowKey] = useState(false);
   const [activePreset, setActivePreset] = useState<string>('');
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState<'context' | 'protocol' | null>(null);
+
+  // Close tooltips on outside click or Esc
+  useEffect(() => {
+    if (!activeTooltip) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.tooltip-container')) {
+        setActiveTooltip(null);
+      }
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActiveTooltip(null);
+    };
+    document.addEventListener('pointerdown', handleClickOutside);
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('pointerdown', handleClickOutside);
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [activeTooltip]);
 
   // Hotkey Cmd+Enter / Ctrl+Enter to run audit
   useEffect(() => {
@@ -201,10 +222,55 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pt-2 border-t border-white/[0.06]">
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           {/* Context Stress Segmented Toggle */}
-          <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="text-[#bbcabf] uppercase tracking-wider font-semibold text-[11px]">
-              Context Stress:
-            </span>
+          <div className="relative flex items-center gap-2 font-mono text-xs tooltip-container">
+            <div className="flex items-center gap-1">
+              <span className="text-[#bbcabf] uppercase tracking-wider font-semibold text-[11px]">
+                Context Stress:
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveTooltip(activeTooltip === 'context' ? null : 'context')}
+                className={`p-1 rounded-md transition cursor-pointer ${
+                  activeTooltip === 'context' ? 'text-[#4cd7f6] bg-[#4cd7f6]/10' : 'text-[#86948a] hover:text-[#4cd7f6]'
+                }`}
+                title="Penjelasan & Analogi Context Stress"
+                aria-label="Info Context Stress"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Context Stress Popover */}
+            {activeTooltip === 'context' && (
+              <div className="absolute bottom-full mb-2.5 left-0 sm:left-auto w-72 sm:w-84 p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-[#dfe2ee]">
+                <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+                  <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
+                    <BookOpen className="w-3 h-3" />
+                    Apa Itu Context Stress?
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTooltip(null)}
+                    className="text-[#86948a] hover:text-[#dfe2ee] p-0.5 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <p className="text-[#bbcabf] text-[11px] leading-relaxed">
+                  <strong>Fungsi:</strong> Menguji daya tahan memori AI saat disodori puluhan ribu kata sekaligus (4k hingga 32k token).
+                </p>
+                <div className="bg-[#1c2028] p-2.5 rounded-lg border border-white/[0.06] text-[11px] text-[#dfe2ee] space-y-1">
+                  <span className="text-[#4edea3] font-semibold font-mono block">💡 Analogi Sederhana:</span>
+                  <p className="text-[#bbcabf] leading-relaxed">
+                    Seperti menyuruh murid membaca buku tebal 100 halaman, lalu diselipkan 1 kalimat sandi rahasia di halaman 82. AI resmi berotak GPU sanggup mengingat dan menjawabnya. Akun tiruan (bot scraper chat gratisan) otaknya akan "kram", memotong teks secara diam-diam (*silent truncate*), atau langsung error 502.
+                  </p>
+                </div>
+                <div className="text-[10px] text-[#86948a] font-mono">
+                  💡 <em>Rekomendasi:</em> Pilih <strong>8k</strong> untuk tes cepat, atau <strong>16k-32k</strong> untuk uji ketahanan batas GPU.
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center rounded-xl bg-[#0a0e16]/90 p-1 border border-white/[0.08] gap-1">
               {[4000, 8000, 16000, 32000].map((size) => (
                 <button
@@ -224,10 +290,58 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
           </div>
 
           {/* Mode Switcher */}
-          <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="text-[#bbcabf] uppercase tracking-wider font-semibold text-[11px]">
-              Protocol:
-            </span>
+          <div className="relative flex items-center gap-2 font-mono text-xs tooltip-container">
+            <div className="flex items-center gap-1">
+              <span className="text-[#bbcabf] uppercase tracking-wider font-semibold text-[11px]">
+                Protocol:
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveTooltip(activeTooltip === 'protocol' ? null : 'protocol')}
+                className={`p-1 rounded-md transition cursor-pointer ${
+                  activeTooltip === 'protocol' ? 'text-[#4cd7f6] bg-[#4cd7f6]/10' : 'text-[#86948a] hover:text-[#4cd7f6]'
+                }`}
+                title="Penjelasan & Analogi Protocol"
+                aria-label="Info Protocol"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Protocol Popover */}
+            {activeTooltip === 'protocol' && (
+              <div className="absolute bottom-full mb-2.5 right-0 sm:left-0 sm:right-auto w-72 sm:w-84 p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-[#dfe2ee]">
+                <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+                  <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
+                    <BookOpen className="w-3 h-3" />
+                    Apa Itu Protocol?
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTooltip(null)}
+                    className="text-[#86948a] hover:text-[#dfe2ee] p-0.5 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="space-y-1.5 text-[11px] text-[#bbcabf]">
+                  <p>
+                    <strong className="text-[#4edea3]">Direct Client:</strong> Browser Anda memanggil API secara langsung tanpa server perantara. Mode ini wajib jika dideploy di web hosting statis seperti Netlify.
+                  </p>
+                  <p>
+                    <strong className="text-[#4cd7f6]">Server Proxy:</strong> Request dikirim lewat server backend lokal. Berfungsi menembus batasan CORS browser dan mengukur latensi jaringan murni.
+                  </p>
+                </div>
+                <div className="bg-[#1c2028] p-2.5 rounded-lg border border-white/[0.06] text-[11px] text-[#dfe2ee] space-y-1">
+                  <span className="text-[#4edea3] font-semibold font-mono block">💡 Analogi Sederhana:</span>
+                  <p className="text-[#bbcabf] leading-relaxed">
+                    <strong>Direct Client</strong> = Seperti Anda mengantar surat sendiri langsung ke rumah kantor AI (bisa dicegat satpam/CORS jika mereka menolak pengunjung luar).<br />
+                    <strong>Server Proxy</strong> = Menitipkan surat ke kurir berlisensi khusus yang punya akses resmi tanpa dicegat satpam.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center rounded-xl bg-[#0a0e16]/90 p-1 border border-white/[0.08] gap-1">
               <button
                 type="button"

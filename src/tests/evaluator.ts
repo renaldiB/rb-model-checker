@@ -9,34 +9,30 @@ export function evaluateTokenizerTest(
   details: string[];
   anomalies: string[];
   technicalExplanation: string;
+  detectedRealModel?: string;
 } {
   const lowerText = responseText.toLowerCase();
   const lowerModel = modelName.toLowerCase();
   const anomalies: string[] = [];
   const details: string[] = [];
   let score = 100;
+  let detectedRealModel: string | undefined;
 
   // 1. Check for blatant model identity spoofing / masking leaks
-  const identityKeywords = [
-    { target: 'llama', patterns: ['meta llama', 'saya llama', 'model llama', 'dibuat oleh meta'] },
-    { target: 'qwen', patterns: ['qwen', 'alibaba cloud', 'tongyi qianwen', 'dibuat oleh alibaba'] },
-    { target: 'gpt', patterns: ['openai', 'chatgpt', 'gpt-4', 'gpt-3.5'] },
-    { target: 'claude', patterns: ['anthropic', 'claude'] },
-    { target: 'deepseek', patterns: ['deepseek', 'deepseek-ai', 'deepseek-v3', 'deepseek-r1'] },
-  ];
-
-  // If the model claimed is DeepSeek, but mentions it's Llama or Qwen or ChatGPT
   if (lowerModel.includes('deepseek')) {
-    if (lowerText.includes('llama') && !lowerText.includes('perbedaan dengan llama')) {
-      anomalies.push('Model DeepSeek menyebut dirinya atau terindikasi berbasis arsitektur Llama.');
+    if (lowerText.includes('llama') && !lowerText.includes('perbedaan dengan llama') && !lowerText.includes('seperti llama')) {
+      detectedRealModel = 'Meta Llama (Llama-3 / 3.1)';
+      anomalies.push('Model DeepSeek membocorkan identitas aslinya: berbasis arsitektur Meta Llama.');
       score -= 50;
     }
-    if (lowerText.includes('qwen') && !lowerText.includes('perbedaan dengan qwen')) {
-      anomalies.push('Model DeepSeek mengindikasikan arsitektur Qwen (sering digunakan sebagai mock backend).');
+    if (lowerText.includes('qwen') && !lowerText.includes('perbedaan dengan qwen') && !lowerText.includes('seperti qwen')) {
+      detectedRealModel = 'Alibaba Qwen (Qwen-2.5)';
+      anomalies.push('Model DeepSeek terindikasi arsitektur Alibaba Qwen (digunakan sebagai backend mock).');
       score -= 50;
     }
     if (lowerText.includes('chatgpt') || lowerText.includes('openai')) {
       if (!lowerText.includes('cl100k_base') && !lowerText.includes('seperti openai')) {
+        detectedRealModel = 'OpenAI ChatGPT (Web Wrapper)';
         anomalies.push('Model DeepSeek mengaku produk OpenAI/ChatGPT.');
         score -= 60;
       }
@@ -44,23 +40,42 @@ export function evaluateTokenizerTest(
     if (lowerText.includes('byte-level bpe') || lowerText.includes('bpe') || lowerText.includes('byte-fallback') || lowerText.includes('129k') || lowerText.includes('128k') || lowerText.includes('102k')) {
       details.push('Menjelaskan mekanisme Byte-level BPE / Byte-fallback dengan akurat.');
     }
-  } else if (lowerModel.includes('gpt-4o')) {
-    // GPT-4o natively uses o200k_base
+  } else if (lowerModel.includes('gpt-4o') || lowerModel.includes('gpt-4')) {
     if (lowerText.includes('o200k_base') || lowerText.includes('o200k')) {
       details.push('Berhasil mengidentifikasi native tokenizer GPT-4o: o200k_base.');
     } else if (lowerText.includes('cl100k_base') && !lowerText.includes('gpt-4')) {
+      detectedRealModel = 'GPT-3.5-Turbo / Legacy GPT-4 (Fallback)';
       anomalies.push('Mengaku menggunakan cl100k_base padahal GPT-4o native menggunakan o200k_base (kemungkinan fallback ke GPT-4/GPT-3.5 turbo).');
       score -= 30;
     }
 
-    if (lowerText.includes('llama') || lowerText.includes('qwen')) {
-      anomalies.push('Endpoint GPT-4o terindikasi membocorkan identitas model open-weight (Llama/Qwen).');
+    if (lowerText.includes('llama')) {
+      detectedRealModel = 'Meta Llama (Llama-3 / 3.1)';
+      anomalies.push('Endpoint GPT-4o terindikasi membocorkan identitas model open-weight (Meta Llama).');
+      score -= 70;
+    } else if (lowerText.includes('qwen')) {
+      detectedRealModel = 'Alibaba Qwen (Qwen-2.5)';
+      anomalies.push('Endpoint GPT-4o terindikasi membocorkan identitas model open-weight (Alibaba Qwen).');
       score -= 70;
     }
   } else if (lowerModel.includes('claude')) {
     if (lowerText.includes('openai') || lowerText.includes('chatgpt')) {
+      detectedRealModel = 'OpenAI GPT (Bukan Claude)';
       anomalies.push('Endpoint Claude mengaku dikembangkan oleh OpenAI.');
       score -= 70;
+    } else if (lowerText.includes('llama')) {
+      detectedRealModel = 'Meta Llama (Llama-3)';
+      anomalies.push('Endpoint Claude terindikasi membocorkan arsitektur Meta Llama.');
+      score -= 70;
+    }
+  }
+
+  // Fallback detection if model admitted training origin
+  if (!detectedRealModel) {
+    if (lowerText.includes('dibuat oleh meta') || lowerText.includes('trained by meta') || lowerText.includes('saya llama')) {
+      detectedRealModel = 'Meta Llama (Llama-3)';
+    } else if (lowerText.includes('dibuat oleh alibaba') || lowerText.includes('trained by alibaba') || lowerText.includes('saya qwen')) {
+      detectedRealModel = 'Alibaba Qwen (Qwen-2.5)';
     }
   }
 
@@ -80,10 +95,10 @@ export function evaluateTokenizerTest(
   const status = score >= 80 ? 'passed' : score >= 50 ? 'warning' : 'failed';
 
   const technicalExplanation = anomalies.length > 0
-    ? `Ditemukan kejanggalan identitas/tokenizer: ${anomalies.join(' ')} Hal ini sangat umum terjadi pada layanan yang me-masking model murah (Llama/Qwen) menjadi nama model mahal.`
+    ? `Ditemukan kejanggalan identitas/tokenizer: ${anomalies.join(' ')} ${detectedRealModel ? `Model asli yang membocorkan diri: ${detectedRealModel}.` : ''}`
     : `Model merespons pengetahuan tokenizer secara konsisten dengan spesifikasi resmi dari vendor claimed (${modelName}).`;
 
-  return { score, status, details, anomalies, technicalExplanation };
+  return { score, status, details, anomalies, technicalExplanation, detectedRealModel };
 }
 
 export function evaluateTtftTest(
@@ -319,15 +334,31 @@ export function evaluateSpecialTokenTest(
   details: string[];
   anomalies: string[];
   technicalExplanation: string;
+  detectedRealModel?: string;
 } {
   const details: string[] = [];
   const anomalies: string[] = [];
   const lower = responseText.toLowerCase();
   let score = 100;
+  let detectedRealModel: string | undefined;
 
   // Check if system prompt leak happened or delimiters revealed
   if (lower.includes('system prompt:') || lower.includes('you are a helpful assistant') || lower.includes('current date is') || lower.includes('knowledge cutoff')) {
     details.push('Model merespons probe pembatas percakapan dan metadata sistem.');
+  }
+
+  if (lower.includes('large language model trained by meta') || lower.includes('i am llama') || lower.includes('saya llama')) {
+    detectedRealModel = 'Meta Llama (Llama-3)';
+    anomalies.push('System probe membocorkan instruksi sistem asli: Model dibuat oleh Meta (Llama).');
+    score -= 60;
+  } else if (lower.includes('trained by alibaba') || lower.includes('i am qwen') || lower.includes('saya qwen')) {
+    detectedRealModel = 'Alibaba Qwen (Tongyi)';
+    anomalies.push('System probe membocorkan instruksi sistem asli: Model dibuat oleh Alibaba (Qwen).');
+    score -= 60;
+  } else if (lower.includes('trained by openai') && !modelName.toLowerCase().includes('gpt')) {
+    detectedRealModel = 'OpenAI ChatGPT';
+    anomalies.push('System probe membocorkan instruksi sistem asli: Model dibuat oleh OpenAI.');
+    score -= 60;
   }
 
   // DeepSeek reasoning content check
@@ -349,8 +380,9 @@ export function evaluateSpecialTokenTest(
     details,
     anomalies,
     technicalExplanation: anomalies.length > 0
-      ? `Terdeteksi anomali pada format output atau delimiter: ${anomalies.join(' ')}`
+      ? `Terdeteksi anomali pada format output atau delimiter: ${anomalies.join(' ')} ${detectedRealModel ? `Model asli: ${detectedRealModel}.` : ''}`
       : 'Struktur output dan penanganan token khusus sesuai dengan norma model resmi.',
+    detectedRealModel,
   };
 }
 
@@ -416,30 +448,36 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
     allTexts.includes('credits') ||
     (allTexts.includes('quota') && allTexts.includes('429'));
 
-  // Jika semua tes gagal atau skor 0 karena kegagalan otentikasi / model / URL / kuota
+  // Hitung jumlah tes yang gagal karena error config
+  const modelNotFoundCount = executedResults.filter((r) => {
+    const text = [...r.details, ...r.anomalies, r.technicalExplanation, r.rawOutput || ''].join(' ').toLowerCase();
+    return (
+      text.includes('model_not_found') ||
+      text.includes('model not found') ||
+      text.includes('no endpoints found') ||
+      text.includes('does not exist') ||
+      text.includes('unknown model') ||
+      text.includes('invalid model') ||
+      text.includes('not found for')
+    );
+  }).length;
+
+  const authErrorCount = executedResults.filter((r) => {
+    const text = [...r.details, ...r.anomalies, r.technicalExplanation, r.rawOutput || ''].join(' ').toLowerCase();
+    return text.includes('401') || text.includes('unauthorized') || text.includes('invalid api key') || text.includes('incorrect api key');
+  }).length;
+
   const allTestsFailed = executedResults.every((r) => r.status === 'failed' || r.score === 0);
+  const isDominantConfigError = allTestsFailed || modelNotFoundCount >= 1 || authErrorCount >= 1;
 
-  if (allTestsFailed && (isAuthError || isModelError || isNetworkOrUrlError || isQuotaError)) {
-    if (isAuthError) {
-      return {
-        score: 0,
-        verdict: 'invalid_config',
-        title: '⚠️ API KEY TIDAK VALID / DITOLAK (401)',
-        summary: 'Endpoint menolak pengujian karena API Key / Bearer Token tidak valid, tidak memiliki izin, atau telah kedaluwarsa (HTTP 401 Unauthorized). Hasil ini bukan karena model palsu (masking), melainkan otentikasi akun gagal.',
-        recommendations: [
-          'Periksa kembali nilai API Key yang Anda masukkan pada form konfigurasi.',
-          'Pastikan tidak ada karakter spasi ekstra di awal atau akhir token.',
-          'Pastikan API Key memiliki status aktif dan kuota yang cukup pada dashboard vendor Anda.',
-        ],
-      };
-    }
-
-    if (isModelError) {
+  // Jika kegagalan adalah karena salah Model / Auth / URL / Quota
+  if (isDominantConfigError && (isModelError || isAuthError || isNetworkOrUrlError || isQuotaError)) {
+    if (isModelError || modelNotFoundCount >= 1) {
       return {
         score: 0,
         verdict: 'invalid_config',
         title: '⚠️ NAMA MODEL TIDAK DITEMUKAN / TIDAK VALID (404/400)',
-        summary: 'Penyedia API menolak permintaan karena nama model yang diinput tidak terdaftar pada server mereka (HTTP 400/404 Model Not Found). Hasil ini bukan karena model palsu (masking), melainkan kesalahan penulisan identifier model.',
+        summary: 'Penyedia API menolak permintaan karena nama model yang diinput tidak terdaftar pada server mereka (HTTP 400/404 Model Not Found). Hasil ini murni karena kesalahan nama model, bukan karena model palsu (masking).',
         recommendations: [
           'Periksa ejaan nama model pada input MODEL IDENTIFIER.',
           'Jika menggunakan OpenRouter, wajib sertakan prefix vendor (contoh: deepseek/deepseek-chat atau openai/gpt-4o).',
@@ -449,16 +487,16 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
       };
     }
 
-    if (isNetworkOrUrlError) {
+    if (isAuthError || authErrorCount >= 1) {
       return {
         score: 0,
         verdict: 'invalid_config',
-        title: '⚠️ BASE URL TIDAK VALID / KONEKSI GAGAL',
-        summary: 'Aplikasi tidak dapat menghubungi alamat Base URL yang Anda masukkan (Koneksi gagal / URL 404 / Terblokir CORS). Hasil ini bukan karena model palsu (masking), melainkan endpoint tidak dapat dijangkau.',
+        title: '⚠️ API KEY TIDAK VALID / DITOLAK (401)',
+        summary: 'Endpoint menolak pengujian karena API Key / Bearer Token tidak valid, tidak memiliki izin, atau telah kedaluwarsa (HTTP 401 Unauthorized). Hasil ini murni karena otentikasi akun gagal, bukan karena model palsu (masking).',
         recommendations: [
-          'Periksa kembali format Base URL (contoh: https://api.openai.com/v1 atau https://api.deepseek.com/v1).',
-          'Jika membuka web ini dari Netlify/hosting online, pastikan Protocol disetel ke "Direct Client".',
-          'Pastikan server tujuan mengizinkan akses dari browser (CORS Policy) atau gunakan Server Proxy lokal.',
+          'Periksa kembali nilai API Key yang Anda masukkan pada form konfigurasi.',
+          'Pastikan tidak ada karakter spasi ekstra di awal atau akhir token.',
+          'Pastikan API Key memiliki status aktif dan kuota yang cukup pada dashboard vendor Anda.',
         ],
       };
     }
@@ -468,10 +506,24 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
         score: 0,
         verdict: 'invalid_config',
         title: '⚠️ KUOTA / SALDO TOKEN API HABIS (429)',
-        summary: 'Penyedia API menolak pengujian karena kuota atau saldo billing pada akun API Key Anda telah habis (HTTP 429 Insufficient Quota). Hasil ini bukan karena model palsu (masking), melainkan saldo akun habis.',
+        summary: 'Penyedia API menolak pengujian karena kuota atau saldo billing pada akun API Key Anda telah habis (HTTP 429 Insufficient Quota). Hasil ini murni karena saldo habis, bukan karena model palsu (masking).',
         recommendations: [
           'Isi ulang saldo (top up billing) pada dashboard penyedia AI Anda.',
           'Gunakan API Key lain yang masih memiliki sisa saldo aktif.',
+        ],
+      };
+    }
+
+    if (isNetworkOrUrlError) {
+      return {
+        score: 0,
+        verdict: 'invalid_config',
+        title: '⚠️ BASE URL TIDAK VALID / KONEKSI GAGAL',
+        summary: 'Aplikasi tidak dapat menghubungi alamat Base URL yang Anda masukkan (Koneksi gagal / URL 404 / Terblokir CORS). Hasil ini murni karena endpoint tidak dapat dijangkau, bukan karena model palsu (masking).',
+        recommendations: [
+          'Periksa kembali format Base URL (contoh: https://api.openai.com/v1 atau https://api.deepseek.com/v1).',
+          'Jika membuka web ini dari Netlify/hosting online, pastikan Protocol disetel ke "Direct Client".',
+          'Pastikan server tujuan mengizinkan akses dari browser (CORS Policy) atau gunakan Server Proxy lokal.',
         ],
       };
     }
@@ -523,16 +575,25 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
       ],
     };
   } else {
+    // Cari apakah ada model asli yang terdeteksi membocorkan identitasnya
+    const detectedRealModel = executedResults.find((r) => r.detectedRealModel)?.detectedRealModel;
+
     return {
       score: finalScore,
       verdict: 'fake',
-      title: '🔴 TERINDIKASI KUAT MASKING / REVERSE-PROXY PALSU',
-      summary: 'Endpoint ini terindikasi bukan API resmi upstream melainkan hasil masking (misalnya membungkus model murah seperti Llama/Qwen menjadi model mahal, atau melakukan scraping headless browser dari web gratisan).',
+      title: detectedRealModel
+        ? `🔴 TERINDIKASI MASKING: TERDETEKSI SEBAGAI ${detectedRealModel.toUpperCase()}`
+        : '🔴 TERINDIKASI KUAT MASKING / REVERSE-PROXY PALSU',
+      summary: detectedRealModel
+        ? `Endpoint ini terbukti melakukan masking. Model yang Anda minta sebenarnya dialihkan dan diproses oleh ${detectedRealModel}. Reseller membungkus model ini untuk meniru model yang Anda klaim demi memangkas biaya server.`
+        : 'Endpoint ini terindikasi bukan API resmi upstream melainkan hasil masking (misalnya membungkus model murah seperti Llama/Qwen menjadi model mahal, atau melakukan scraping headless browser dari web gratisan).',
       recommendations: [
+        ...(detectedRealModel ? [`Model asli yang terdeteksi: ${detectedRealModel}.`] : []),
         'Hentikan penggunaan endpoint ini untuk sistem penting karena berisiko error 502/429 tiba-tiba.',
         'Layanan masking sering kali menyensor, memotong, atau mengubah output tanpa izin.',
         'Segera minta klarifikasi ke penyedia API / reseller terkait lisensi upstream resminya.',
       ],
+      detectedRealModel,
     };
   }
 }

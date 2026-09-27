@@ -26,6 +26,7 @@ export interface TestResult {
   rawOutput?: string;
   anomalies: string[];
   timestamp?: number;
+  detectedRealModel?: string;
 }
 
 export interface StreamEventData {
@@ -50,6 +51,7 @@ export interface OverallVerdict {
   title: string;
   summary: string;
   recommendations: string[];
+  detectedRealModel?: string;
 }
 
 export interface PresetProvider {

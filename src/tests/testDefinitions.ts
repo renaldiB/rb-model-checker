@@ -85,6 +85,7 @@ export const TEST_SUITE: TestDefinition[] = [
                 details: evalRes.details,
                 anomalies: evalRes.anomalies,
                 technicalExplanation: evalRes.technicalExplanation,
+                detectedRealModel: evalRes.detectedRealModel,
                 rawOutput: fullText,
                 timestamp: Date.now(),
               });
@@ -307,6 +308,27 @@ export const TEST_SUITE: TestDefinition[] = [
         max_tokens: 300,
       });
 
+      if (!res.ok) {
+        const errorMsg = res.data?.error?.message || res.data?.error || `HTTP ${res.status}`;
+        const modelHint = formatModelErrorHint(config.baseUrl, config.model);
+        const anomalies = [`Request gagal (${res.status}): ${errorMsg}`];
+        if (modelHint) anomalies.push(modelHint);
+        return {
+          id: 'special-tokens-probe',
+          name: '5. Uji Delimiter Khusus & System Probe',
+          shortDesc: 'Uji format delimiter khusus arsitektur dan format reasoning.',
+          status: 'failed',
+          score: 0,
+          weight: 15,
+          durationMs: res.durationMs,
+          details: [`Gagal menghubungi endpoint: ${errorMsg}`],
+          anomalies,
+          technicalExplanation: modelHint || 'Endpoint gagal memproses request pengujian delimiter khusus.',
+          rawOutput: JSON.stringify(res.data, null, 2),
+          timestamp: Date.now(),
+        };
+      }
+
       const content = res.data?.choices?.[0]?.message?.content || JSON.stringify(res.data);
       const evalRes = evaluateSpecialTokenTest(config.model, content);
 
@@ -321,6 +343,7 @@ export const TEST_SUITE: TestDefinition[] = [
         details: evalRes.details,
         anomalies: evalRes.anomalies,
         technicalExplanation: evalRes.technicalExplanation,
+        detectedRealModel: evalRes.detectedRealModel,
         rawOutput: content,
         timestamp: Date.now(),
       };

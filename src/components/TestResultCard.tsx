@@ -137,6 +137,21 @@ export const TestResultCard: React.FC<TestResultCardProps> = ({
           </div>
         )}
 
+        {/* Detected Real Model Callout */}
+        {result.detectedRealModel && (
+          <div className="p-3 rounded-xl bg-[#f43f5e]/15 border border-[#f43f5e]/40 font-mono text-xs flex items-center gap-2.5">
+            <AlertTriangle className="w-4 h-4 text-[#f43f5e] shrink-0" />
+            <div className="text-[11px] leading-relaxed">
+              <span className="text-[#ffb4ab] font-bold block text-[10px] uppercase tracking-wide">
+                MODEL ASLI TERDETEKSI (MASKING TERBONGKAR):
+              </span>
+              <span className="text-[#dfe2ee]">
+                Sebenarnya berjalan di atas: <strong className="text-[#f43f5e] font-bold underline">{result.detectedRealModel}</strong>
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Anomalies Alert Box */}
         {result.anomalies && result.anomalies.length > 0 && (
           <div className="p-3 rounded-xl bg-[#f43f5e]/10 border border-[#f43f5e]/30 text-[#ffb4ab] text-xs space-y-1 font-mono">
@@ -201,9 +216,9 @@ export const TestResultCard: React.FC<TestResultCardProps> = ({
           type="button"
           onClick={() => onRunSingle(result.id)}
           disabled={isRunning}
-          className="flex items-center gap-1.5 font-mono text-xs font-medium text-[#bbcabf] hover:text-[#dfe2ee] px-3 py-1.5 rounded-lg bg-[#262a33] hover:bg-[#31353e] border border-white/[0.08] transition cursor-pointer disabled:opacity-50"
+          className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#4cd7f6] hover:text-[#e0f7fe] px-3.5 py-1.5 rounded-lg bg-[#4cd7f6]/10 hover:bg-[#4cd7f6]/20 border border-[#4cd7f6]/40 hover:border-[#4cd7f6]/70 shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_16px_rgba(6,182,212,0.3)] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <RefreshCw className="w-3 h-3" />
+          <RefreshCw className="w-3 h-3 text-[#4cd7f6]" />
           <span>Uji Modul Ini Saja</span>
         </button>
       </div>

@@ -155,6 +155,26 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
             {verdict.summary}
           </p>
 
+          {/* Real Detected Model Callout when Masking */}
+          {verdict.detectedRealModel && (
+            <div className="bg-[#f43f5e]/10 border border-[#f43f5e]/40 rounded-xl p-4 text-left font-mono space-y-2">
+              <div className="text-xs font-bold text-[#f43f5e] uppercase tracking-wider flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-[#f43f5e]" />
+                <span>IDENTITAS ASLI TERBONGKAR (SPOOFING DETECTED)</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-sm text-[#dfe2ee]">
+                <Cpu className="w-4 h-4 text-[#4cd7f6]" />
+                <span>Backend inference sebenarnya berjalan di atas:</span>
+                <span className="font-bold text-[#4cd7f6] bg-[#4cd7f6]/10 px-2.5 py-1 rounded border border-[#4cd7f6]/30">
+                  {verdict.detectedRealModel}
+                </span>
+              </div>
+              <p className="text-[11px] text-[#bbcabf]">
+                Model ini membocorkan identitas aslinya saat diuji token khusus atau prompt boundary, membuktikan adanya pengalihan (rerouting/masking).
+              </p>
+            </div>
+          )}
+
           {/* Diagnostic Highlight Cards or Recommendations */}
           {isInvalidConfig && verdict.recommendations?.length > 0 ? (
             <div className="bg-[#0a0e16]/80 border border-[#f59e0b]/30 rounded-xl p-4 text-left font-mono text-xs space-y-2">

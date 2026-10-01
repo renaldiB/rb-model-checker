@@ -147,18 +147,19 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
                   <strong>Apa fungsinya?</strong> Menguji seberapa kuat ingatan model AI saat disuruh membaca puluhan ribu kata (4.000 hingga 32.000 token) dalam sekali prompt.
                 </p>
                 <div className="bg-[#1c2028] p-3.5 rounded-lg border border-white/[0.06] space-y-2">
-                  <span className="text-[#4edea3] font-semibold font-mono text-xs block">
-                    💡 Analogi Sederhana: Buku 100 Halaman &amp; Jarum Tersembunyi
+                  <span className="text-emerald-400 font-medium font-mono text-xs flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" />
+                    Analogi Sederhana: Buku 100 Halaman &amp; Jarum Tersembunyi
                   </span>
-                  <p className="text-[#bbcabf] text-xs leading-relaxed">
+                  <p className="text-[#bbcabf] text-xs leading-relaxed font-normal">
                     Bayangkan Anda menyuruh seorang murid membaca buku tebal 100 halaman dalam waktu 5 detik. Di halaman 82, Anda menyisipkan catatan sandi rahasia: <em>"Kunci brankas ada di dalam cangkir biru"</em>.
                   </p>
-                  <ul className="list-disc list-inside space-y-1 text-xs text-[#dfe2ee] pt-1">
+                  <ul className="list-disc list-inside space-y-1 text-xs text-[#dfe2ee] pt-1 font-normal">
                     <li>
-                      <strong className="text-[#4edea3]">Model AI Asli (GPU Enterprise):</strong> Otak memorinya besar, membaca seluruh 100 halaman, dan dengan cepat menjawab letak kunci brankas tersebut.
+                      <strong className="text-emerald-400 font-medium">Model AI Asli (GPU Enterprise):</strong> Otak memorinya besar, membaca seluruh 100 halaman, dan dengan cepat menjawab letak kunci brankas tersebut.
                     </li>
                     <li>
-                      <strong className="text-[#f43f5e]">Model Tiruan / Web Scraper Gratisan:</strong> Karena server web chat gratisan membatasi ukuran teks, mereka akan memotong 90 halaman secara diam-diam (<em>silent truncate</em>) atau servernya langsung mogok (<em>502 Bad Gateway</em>). Hasilnya: model gagal menjawab sandi rahasia.
+                      <strong className="text-rose-400 font-medium">Model Tiruan / Web Scraper Gratisan:</strong> Karena server web chat gratisan membatasi ukuran teks, mereka akan memotong 90 halaman secara diam-diam (<em>silent truncate</em>) atau servernya langsung mogok (<em>502 Bad Gateway</em>). Hasilnya: model gagal menjawab sandi rahasia.
                     </li>
                   </ul>
                 </div>
@@ -167,31 +168,33 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
               {/* Concept 3: TTFT & Jitter */}
               <div className="p-4 sm:p-5 rounded-xl bg-[#0a0e16]/80 border border-white/[0.08] space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[#4edea3] font-bold text-sm sm:text-base font-mono">
-                    <Zap className="w-4 h-4" />
+                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm sm:text-base font-mono">
+                    <Zap className="w-4 h-4 stroke-[1.75]" />
                     <h4>3. TTFT (Time to First Token) &amp; Jitter</h4>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#4edea3]/10 text-[#4edea3] border border-[#4edea3]/20 font-mono">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                     KECEPATAN RESPON
                   </span>
                 </div>
-                <p className="text-[#bbcabf] leading-relaxed">
+                <p className="text-[#bbcabf] leading-relaxed font-normal">
                   <strong>Apa fungsinya?</strong> Mengukur waktu jeda sebelum AI mulai mengeluarkan kata pertama, dan seberapa stabil aliran ketikan yang keluar.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
                   <div className="bg-[#1c2028] p-3.5 rounded-lg border border-white/[0.06] space-y-1.5">
-                    <span className="text-[#4edea3] font-semibold font-mono text-xs block">
-                      ⚡ TTFT: Pelayan Restoran
+                    <span className="text-emerald-400 font-medium font-mono text-xs flex items-center gap-1.5">
+                      <Zap className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" />
+                      TTFT: Pelayan Restoran
                     </span>
-                    <p className="text-[#bbcabf] text-xs leading-relaxed">
+                    <p className="text-[#bbcabf] text-xs leading-relaxed font-normal">
                       Seberapa cepat pelayan meletakkan cangkir minuman pertama di meja Anda setelah Anda memesan. AI resmi upstream menyajikannya kilat dalam <strong>&lt; 800 ms</strong>. Jika butuh 3.000 - 5.000 ms, berarti pesanan Anda dilarikan dulu ke browser bot web chat gratisan!
                     </p>
                   </div>
                   <div className="bg-[#1c2028] p-3.5 rounded-lg border border-white/[0.06] space-y-1.5">
-                    <span className="text-[#4cd7f6] font-semibold font-mono text-xs block">
-                      🌊 Jitter: Aliran Keran Air
+                    <span className="text-emerald-400 font-medium font-mono text-xs flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" />
+                      Jitter: Aliran Keran Air
                     </span>
-                    <p className="text-[#bbcabf] text-xs leading-relaxed">
+                    <p className="text-[#bbcabf] text-xs leading-relaxed font-normal">
                       AI asli memuntahkan kata seperti keran air yang mengucur deras dan stabil (jitter rendah &lt; 150ms). Jika alirannya batuk-batuk atau tersendat tiap beberapa detik (jitter tinggi), berarti ada bot perantara yang menahan aliran teks.
                     </p>
                   </div>
@@ -201,25 +204,26 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
               {/* Concept 4: Logprobs Fidelity */}
               <div className="p-4 sm:p-5 rounded-xl bg-[#0a0e16]/80 border border-white/[0.08] space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[#4cd7f6] font-bold text-sm sm:text-base font-mono">
-                    <Database className="w-4 h-4" />
+                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm sm:text-base font-mono">
+                    <Database className="w-4 h-4 stroke-[1.75]" />
                     <h4>4. Logprobs Fidelity (Sidik Jari Softmax GPU)</h4>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#4cd7f6]/10 text-[#4cd7f6] border border-[#4cd7f6]/20 font-mono">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                     BUKTI MATEMATIS
                   </span>
                 </div>
-                <p className="text-[#bbcabf] leading-relaxed">
+                <p className="text-[#bbcabf] leading-relaxed font-normal">
                   <strong>Apa fungsinya?</strong> Memeriksa apakah server AI bersedia memberikan lembar kalkulasi probabilitas angka di balik setiap kata yang ia pilih.
                 </p>
                 <div className="bg-[#1c2028] p-3.5 rounded-lg border border-white/[0.06] space-y-2">
-                  <span className="text-[#4edea3] font-semibold font-mono text-xs block">
-                    💡 Analogi Sederhana: Kertas Coretan Ujian / Rekam Medis Dokter
+                  <span className="text-emerald-400 font-medium font-mono text-xs flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" />
+                    Analogi Sederhana: Kertas Coretan Ujian / Rekam Medis Dokter
                   </span>
-                  <p className="text-[#bbcabf] text-xs leading-relaxed">
+                  <p className="text-[#bbcabf] text-xs leading-relaxed font-normal">
                     Dokter spesialis asli dapat menunjukkan lembar tes laboratorium dan hitungan persentase dosis obat. Sebaliknya, dukun palsu hanya bisa memberikan kata-kata kesimpulan akhir tanpa pernah bisa memperlihatkan coretan hitungan aslinya.
                   </p>
-                  <p className="text-[#86948a] text-xs leading-relaxed">
+                  <p className="text-[#86948a] text-xs leading-relaxed font-normal">
                     Server AI asli (GPU vLLM/OpenAI) mampu mengembalikan data logprobs ini secara instan. Layanan scraping web chat tidak punya akses ke chip GPU, sehingga mereka akan menolak permintaan ini (HTTP 400/500) atau mengabaikannya.
                   </p>
                 </div>
@@ -228,25 +232,26 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({ isOpen, onCl
               {/* Concept 5: Tokenizer Trap */}
               <div className="p-4 sm:p-5 rounded-xl bg-[#0a0e16]/80 border border-white/[0.08] space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-[#4edea3] font-bold text-sm sm:text-base font-mono">
-                    <Cpu className="w-4 h-4" />
+                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm sm:text-base font-mono">
+                    <Cpu className="w-4 h-4 stroke-[1.75]" />
                     <h4>5. Tokenizer Boundary Trap (Tes Logat / Bahasa Ibu)</h4>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#4edea3]/10 text-[#4edea3] border border-[#4edea3]/20 font-mono">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                     IDENTITAS ARSITEKTUR
                   </span>
                 </div>
-                <p className="text-[#bbcabf] leading-relaxed">
+                <p className="text-[#bbcabf] leading-relaxed font-normal">
                   <strong>Apa fungsinya?</strong> Menjebak model AI untuk membongkar identitas aslinya melalui cara ia memotong suku kata (tokenizer).
                 </p>
                 <div className="bg-[#1c2028] p-3.5 rounded-lg border border-white/[0.06] space-y-2">
-                  <span className="text-[#4edea3] font-semibold font-mono text-xs block">
-                    💡 Analogi Sederhana: Tes Bahasa Ibu Seseorang
+                  <span className="text-emerald-400 font-medium font-mono text-xs flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" />
+                    Analogi Sederhana: Tes Bahasa Ibu Seseorang
                   </span>
-                  <p className="text-[#bbcabf] text-xs leading-relaxed">
+                  <p className="text-[#bbcabf] text-xs leading-relaxed font-normal">
                     Seseorang mengaku lahir dan besar di pedalaman London. Namun saat diajak bicara cepat atau disodori peribahasa lokal kuno, dialek dan kosakata aslinya malah terdengar seperti orang dari negara lain.
                   </p>
-                  <p className="text-[#86948a] text-xs leading-relaxed">
+                  <p className="text-[#86948a] text-xs leading-relaxed font-normal">
                     Jika sebuah provider mengklaim menjual model <code>gpt-4o</code> (yang native memakai tokenizer <code>o200k_base</code>), tetapi saat diberi prompt jebakan ia mengaku sebagai <em>Llama-3</em> atau memotong kata dengan aturan <em>Qwen</em>, maka endpoint tersebut terbukti melakukan penipuan (spoofing/masking).
                   </p>
                 </div>

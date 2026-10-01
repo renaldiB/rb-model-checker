@@ -9,8 +9,7 @@ import { MethodologyModal } from './components/MethodologyModal';
 import { HistoryModal, HistoryItem } from './components/HistoryModal';
 import { TEST_SUITE } from './tests/testDefinitions';
 import { computeOverallVerdict } from './tests/evaluator';
-import { EndpointConfig, OverallVerdict, TestResult } from './types';
-import { Biotech, Layers, ShieldCheck, Zap } from 'lucide-react';
+import { Layers } from 'lucide-react';
 
 const isLocalhost = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
@@ -248,12 +247,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f131c] text-[#dfe2ee] flex flex-col font-sans relative selection:bg-[#10b981]/30 selection:text-[#4edea3]">
-      {/* Top Decorative Zero-Plane Reticle */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-48 pointer-events-none opacity-20 -z-10 flex items-center justify-center">
-        <div className="w-[600px] h-[600px] rounded-full border border-[#4cd7f6]/20 blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative selection:bg-emerald-500/30 selection:text-emerald-400">
       {/* Top Header */}
       <Header
         proxyMode={config.proxyMode}
@@ -264,40 +258,40 @@ export const App: React.FC = () => {
       {/* Main Container */}
       <main className="flex-1 w-full max-w-[1520px] mx-auto px-2.5 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-5 sm:space-y-8">
         {/* Operational Status & Headline Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-5 border-b border-white/[0.08] pb-5 sm:pb-6">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-5 border-b border-slate-800 pb-5 sm:pb-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/30 text-[#4edea3] font-mono text-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4edea3] animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 ACTIVE TELEMETRY SENSOR // NODE #04
               </span>
-              <span className="text-[#bbcabf] font-mono text-[11px] sm:text-xs">
+              <span className="text-slate-400 font-mono text-[11px] sm:text-xs">
                 ENCLAVE: TLS 1.3 SECURED
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-[#dfe2ee] leading-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-100 leading-tight">
               AI Endpoint Authenticity &amp; Anti-Masking Radar
             </h1>
 
-            <p className="text-xs sm:text-sm text-[#bbcabf] max-w-3xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-400 max-w-3xl leading-relaxed">
               Lakukan atestasi kriptografis, analisis entropi logprobs, batas tokenizer byte-fallback, dan stress context window untuk mengungkap model yang disamarkan (masking), kuantisasi palsu, atau hasil scraping web chat.
             </p>
           </div>
 
           {/* Quick Action Stats Strip */}
-          <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 sm:gap-4 bg-[#181c24]/80 backdrop-blur-md p-3 sm:px-4 sm:py-2.5 rounded-xl border border-white/[0.08] font-mono w-full sm:w-auto shrink-0">
-            <div className="space-y-0.5 pr-2 sm:pr-4 border-r border-white/[0.08] text-center sm:text-left">
-              <div className="text-[9px] sm:text-[10px] text-[#bbcabf] uppercase tracking-tight">INSPECTION ENGINE</div>
-              <div className="text-[11px] sm:text-xs text-[#4cd7f6] font-bold truncate">v4.2.8-FORENSIC</div>
+          <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 sm:gap-4 bg-slate-900 p-3 sm:px-4 sm:py-2.5 rounded-xl border border-slate-800 font-mono w-full sm:w-auto shrink-0 shadow-sm">
+            <div className="space-y-0.5 pr-2 sm:pr-4 border-r border-slate-800 text-center sm:text-left">
+              <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-tight font-normal">INSPECTION ENGINE</div>
+              <div className="text-[11px] sm:text-xs text-slate-200 font-bold truncate">v4.2.8-FORENSIC</div>
             </div>
-            <div className="space-y-0.5 px-1 sm:px-0 sm:pr-4 border-r border-white/[0.08] text-center sm:text-left">
-              <div className="text-[9px] sm:text-[10px] text-[#bbcabf] uppercase tracking-tight">ENTROPY TOLERANCE</div>
-              <div className="text-[11px] sm:text-xs text-[#4edea3] font-bold">±0.012 nats</div>
+            <div className="space-y-0.5 px-1 sm:px-0 sm:pr-4 border-r border-slate-800 text-center sm:text-left">
+              <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-tight font-normal">ENTROPY TOLERANCE</div>
+              <div className="text-[11px] sm:text-xs text-emerald-400 font-bold">±0.012 nats</div>
             </div>
             <div className="space-y-0.5 pl-1 sm:pl-0 text-center sm:text-left">
-              <div className="text-[9px] sm:text-[10px] text-[#bbcabf] uppercase tracking-tight">REPLAY GUARD</div>
-              <div className="text-[11px] sm:text-xs text-[#10b981] font-bold">ARMED</div>
+              <div className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-tight font-normal">REPLAY GUARD</div>
+              <div className="text-[11px] sm:text-xs text-emerald-400 font-bold">ARMED</div>
             </div>
           </div>
         </div>
@@ -327,28 +321,34 @@ export const App: React.FC = () => {
           verdict={verdict}
           results={results}
           onExport={() => setExportOpen(true)}
+          onRetry={handleRunAll}
+          hasValidConfig={Boolean(config.baseUrl && config.model)}
         />
 
         {/* SECTION 4: 5-MODULE FORENSIC TEST GRID */}
         <section className="space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#4edea3]/10 flex items-center justify-center border border-[#4edea3]/20">
-                <Layers className="w-4 h-4 text-[#4edea3]" />
+              <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                <Layers className="w-4 h-4 text-emerald-400 stroke-[1.75]" />
               </div>
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#dfe2ee] font-mono">
+              <h2 className="text-base sm:text-lg font-semibold tracking-tight text-slate-100 font-mono">
                 Forensic Probe Matrix (5 Active Verification Vectors)
               </h2>
             </div>
-            <span className="font-mono text-xs text-[#bbcabf] px-3 py-1 rounded-full bg-[#181c24] border border-white/[0.08] self-start sm:self-auto">
+            <span className="font-mono text-xs text-slate-400 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 self-start sm:self-auto">
               {results.filter((r) => r.status === 'passed').length} / {results.length} VECTORS VALIDATED
             </span>
           </div>
 
-          {/* Responsive Grid: 2 columns on desktop, 1 on mobile, card 5 spans 2 cols */}
+          {/* Responsive Grid: 2 columns on desktop, 1 on mobile, card 5 spans 2 cols with staggered animation */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
             {results.map((res, idx) => (
-              <div key={res.id} className={idx === 4 ? "md:col-span-2" : ""}>
+              <div
+                key={res.id}
+                className={`${idx === 4 ? "md:col-span-2" : ""} animate-fade-in`}
+                style={{ animationDelay: `${idx * 60}ms` }}
+              >
                 <TestResultCard
                   result={res}
                   onRunSingle={handleRunSingle}
@@ -361,11 +361,11 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="w-full bg-[#0a0e16] border-t border-white/[0.08] py-5 mt-16">
-        <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3 font-mono text-xs text-[#86948a]">
+      <footer className="w-full bg-slate-950 border-t border-slate-800 py-5 mt-16">
+        <div className="max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3 font-mono text-xs text-slate-500">
           <span>MODEL LEGIT CHECK // ZERO-TRUST AI ENDPOINT VERIFICATION FRAMEWORK</span>
           <div className="flex items-center gap-4 text-[11px]">
-            <span className="text-[#4edea3]">CORE TELEMETRY: NOMINAL</span>
+            <span className="text-emerald-400">CORE TELEMETRY: NOMINAL</span>
             <span>SHA-256 INTEGRITY VALIDATED</span>
           </div>
         </div>

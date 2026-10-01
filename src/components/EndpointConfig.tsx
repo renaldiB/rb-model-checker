@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Play, Server, Globe, Key, Copy, Check, Radar, Layers, HelpCircle, X, BookOpen, AlertTriangle } from 'lucide-react';
+import { Eye, EyeOff, Play, Server, Globe, Key, Copy, Check, Radar, Layers, HelpCircle, X, BookOpen, AlertTriangle, Info } from 'lucide-react';
 import { EndpointConfig, PresetProvider } from '../types';
 
 interface EndpointConfigProps {
@@ -117,17 +117,14 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
   };
 
   return (
-    <section className="bg-[#1c2028]/60 backdrop-blur-xl rounded-xl border border-white/[0.08] p-5 sm:p-7 shadow-xl relative overflow-hidden space-y-6">
-      {/* Decorative ambient aura */}
-      <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#4cd7f6]/5 rounded-full blur-3xl pointer-events-none" />
-
+    <section className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-7 shadow-lg space-y-6">
       {/* Target Route Presets Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.06] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-[#4cd7f6]/10 flex items-center justify-center border border-[#4cd7f6]/20">
-            <Layers className="w-4 h-4 text-[#4cd7f6]" />
+          <div className="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700/80 flex items-center justify-center shrink-0">
+            <Layers className="w-4 h-4 text-emerald-400 stroke-[1.75]" />
           </div>
-          <span className="font-mono text-xs sm:text-sm uppercase tracking-wider font-semibold text-[#dfe2ee]">
+          <span className="font-mono text-xs sm:text-sm uppercase tracking-wider font-semibold text-slate-200">
             Target Route Presets
           </span>
         </div>
@@ -141,10 +138,10 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
                 key={preset.name}
                 type="button"
                 onClick={() => handlePresetSelect(preset)}
-                className={`px-3.5 py-1.5 rounded-full font-mono text-xs transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full font-mono text-xs transition-all active:scale-[0.98] cursor-pointer ${
                   isSelected
-                    ? 'bg-[#4cd7f6]/15 border border-[#4cd7f6]/40 text-[#4cd7f6] shadow-[0_0_12px_rgba(6,182,212,0.25)] font-semibold'
-                    : 'border border-white/[0.08] text-[#bbcabf] hover:text-[#dfe2ee] hover:bg-[#262a33]'
+                    ? 'bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 font-medium'
+                    : 'border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
                 }`}
               >
                 {preset.name}
@@ -158,9 +155,9 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-5">
         {/* Base URL */}
         <div className="md:col-span-2 lg:col-span-5 flex flex-col gap-1.5">
-          <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
-            <span className="font-semibold uppercase tracking-wider">ENDPOINT BASE URL</span>
-            <span className="text-[#4cd7f6] text-[10px] px-2 py-0.5 rounded-full bg-[#4cd7f6]/10 border border-[#4cd7f6]/20 font-mono">
+          <label className="flex items-center justify-between font-mono text-xs text-slate-400">
+            <span className="font-normal uppercase tracking-wider">ENDPOINT BASE URL</span>
+            <span className="text-emerald-400 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 font-mono">
               OPENAI COMPATIBLE
             </span>
           </label>
@@ -169,28 +166,28 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
               type="text"
               value={config.baseUrl}
               onChange={(e) => onChange({ ...config, baseUrl: e.target.value })}
-              placeholder="https://api.xyz.com/v1"
-              className="w-full bg-[#0a0e16]/90 border border-white/[0.1] rounded-xl px-4 py-2.5 text-[#dfe2ee] font-mono text-xs focus:border-[#4cd7f6] focus:ring-1 focus:ring-[#4cd7f6]/50 outline-none transition-all pr-12"
+              placeholder="https://api.openai.com/v1"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 font-mono text-xs focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 outline-none transition-all pr-12"
             />
             <button
               type="button"
               onClick={handleCopyUrl}
-              className="absolute right-2.5 p-1.5 rounded-lg hover:bg-[#262a33] text-[#bbcabf] hover:text-[#4cd7f6] transition cursor-pointer"
+              className="absolute right-2.5 p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-emerald-400 active:scale-[0.98] transition cursor-pointer"
               title="Salin URL"
             >
-              {copiedUrl ? <Check className="w-3.5 h-3.5 text-[#4edea3]" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedUrl ? <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" /> : <Copy className="w-3.5 h-3.5 stroke-[1.75]" />}
             </button>
           </div>
         </div>
 
         {/* API Key */}
         <div className="md:col-span-1 lg:col-span-4 flex flex-col gap-1.5">
-          <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
-            <span className="flex items-center gap-1 font-semibold uppercase tracking-wider">
-              <Key className="w-3 h-3 text-[#86948a]" />
+          <label className="flex items-center justify-between font-mono text-xs text-slate-400">
+            <span className="flex items-center gap-1 font-normal uppercase tracking-wider">
+              <Key className="w-3 h-3 text-slate-400 stroke-[1.75]" />
               BEARER TOKEN / API KEY
             </span>
-            <span className="text-[#4edea3] text-[10px] px-2 py-0.5 rounded-full bg-[#4edea3]/10 border border-[#4edea3]/20 font-mono">
+            <span className="text-slate-400 text-[10px] px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700/80 font-mono">
               DISIMPAN LOKAL
             </span>
           </label>
@@ -199,66 +196,66 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
               type={showKey ? 'text' : 'password'}
               value={config.apiKey}
               onChange={(e) => onChange({ ...config, apiKey: e.target.value })}
-              placeholder="sk-..."
-              className="w-full bg-[#0a0e16]/90 border border-white/[0.1] rounded-xl px-4 py-2.5 text-[#dfe2ee] font-mono text-xs focus:border-[#4cd7f6] focus:ring-1 focus:ring-[#4cd7f6]/50 outline-none transition-all pr-10"
+              placeholder="sk-proj-xxxxxxxxxxxxxxxxxxxxxxxx"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 font-mono text-xs focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 outline-none transition-all pr-10"
             />
             <button
               type="button"
               onClick={() => setShowKey(!showKey)}
-              className="absolute right-2.5 text-[#bbcabf] hover:text-[#dfe2ee] transition p-1.5 rounded-lg hover:bg-[#262a33] cursor-pointer"
+              className="absolute right-2.5 text-slate-400 hover:text-slate-200 transition p-1.5 rounded-lg hover:bg-slate-800 active:scale-[0.98] cursor-pointer"
               title={showKey ? 'Sembunyikan' : 'Tampilkan'}
             >
-              {showKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              {showKey ? <EyeOff className="w-3.5 h-3.5 stroke-[1.75]" /> : <Eye className="w-3.5 h-3.5 stroke-[1.75]" />}
             </button>
           </div>
         </div>
 
         {/* Model Identifier */}
         <div className="md:col-span-1 lg:col-span-3 flex flex-col gap-1.5 relative tooltip-container">
-          <label className="flex items-center justify-between font-mono text-xs text-[#bbcabf]">
-            <span className="flex items-center gap-1 font-semibold uppercase tracking-wider">
+          <label className="flex items-center justify-between font-mono text-xs text-slate-400">
+            <span className="flex items-center gap-1 font-normal uppercase tracking-wider">
               MODEL IDENTIFIER
               <button
                 type="button"
                 onClick={() => setActiveTooltip(activeTooltip === 'model' ? null : 'model')}
                 className={`p-0.5 rounded transition cursor-pointer ${
-                  activeTooltip === 'model' ? 'text-[#4cd7f6] bg-[#4cd7f6]/10' : 'text-[#86948a] hover:text-[#4cd7f6]'
+                  activeTooltip === 'model' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-400 hover:text-emerald-400'
                 }`}
                 title="Panduan Format Penulisan Nama Model"
                 aria-label="Info Format Model"
               >
-                <HelpCircle className="w-3.5 h-3.5" />
+                <HelpCircle className="w-3.5 h-3.5 stroke-[1.75]" />
               </button>
             </span>
-            <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${config.baseUrl.includes('openrouter.ai') ? 'bg-[#4cd7f6]/15 text-[#4cd7f6] border border-[#4cd7f6]/30' : 'text-[#bbcabf]'}`}>
+            <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${config.baseUrl.includes('openrouter.ai') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 bg-slate-800'}`}>
               {config.baseUrl.includes('openrouter.ai') ? 'VENDOR/MODEL' : 'PARAM TAG'}
             </span>
           </label>
 
           {/* Model Format Help Popover */}
           {activeTooltip === 'model' && (
-            <div className="absolute bottom-full mb-2 right-0 sm:left-0 sm:right-auto w-[calc(100vw-3rem)] sm:w-80 max-w-sm p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2 animate-fade-in text-[#dfe2ee]">
-              <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
-                <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
-                  <BookOpen className="w-3 h-3" />
+            <div className="absolute bottom-full mb-2 right-0 sm:left-0 sm:right-auto w-[calc(100vw-3rem)] sm:w-80 max-w-sm p-4 rounded-xl bg-slate-900 border border-slate-700 shadow-xl z-40 font-sans text-xs space-y-2 animate-fade-in text-slate-200">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span className="font-semibold font-mono text-emerald-400 text-[11px] uppercase tracking-wide flex items-center gap-1.5">
+                  <BookOpen className="w-3 h-3 stroke-[1.75]" />
                   Format Nama Model
                 </span>
                 <button
                   type="button"
                   onClick={() => setActiveTooltip(null)}
-                  className="text-[#86948a] hover:text-[#dfe2ee] p-0.5 cursor-pointer"
+                  className="text-slate-400 hover:text-slate-200 p-0.5 cursor-pointer"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-3.5 h-3.5 stroke-[1.75]" />
                 </button>
               </div>
-              <div className="space-y-1.5 text-[11px] text-[#bbcabf]">
+              <div className="space-y-1.5 text-[11px] text-slate-300">
                 <p>
-                  <strong className="text-[#4edea3]">API Resmi (OpenAI / DeepSeek / Groq):</strong><br />
-                  Tulis nama model <em>tanpa garis miring</em>. Contoh: <code className="text-[#dfe2ee]">deepseek-chat</code>, <code className="text-[#dfe2ee]">gpt-4o</code>.
+                  <strong className="text-emerald-400 font-medium">API Resmi (OpenAI / DeepSeek / Groq):</strong><br />
+                  Tulis nama model <em>tanpa garis miring</em>. Contoh: <code className="text-slate-100 bg-slate-800 px-1 py-0.5 rounded">deepseek-chat</code>, <code className="text-slate-100 bg-slate-800 px-1 py-0.5 rounded">gpt-4o</code>.
                 </p>
                 <p>
-                  <strong className="text-[#4cd7f6]">Aggregator (OpenRouter):</strong><br />
-                  Wajib menyertakan namespace vendor dengan garis miring. Contoh: <code className="text-[#dfe2ee]">deepseek/deepseek-chat</code>, <code className="text-[#dfe2ee]">openai/gpt-4o</code>.
+                  <strong className="text-emerald-400 font-medium">Aggregator (OpenRouter):</strong><br />
+                  Wajib menyertakan namespace vendor dengan garis miring. Contoh: <code className="text-slate-100 bg-slate-800 px-1 py-0.5 rounded">deepseek/deepseek-chat</code>, <code className="text-slate-100 bg-slate-800 px-1 py-0.5 rounded">openai/gpt-4o</code>.
                 </p>
               </div>
             </div>
@@ -269,24 +266,25 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
               type="text"
               value={config.model}
               onChange={(e) => onChange({ ...config, model: e.target.value })}
-              placeholder={config.baseUrl.includes('openrouter.ai') ? 'misal: deepseek/deepseek-chat' : 'misal: gpt-4o, deepseek-chat'}
-              className="w-full bg-[#0a0e16]/90 border border-white/[0.1] rounded-xl px-4 py-2.5 text-[#dfe2ee] font-mono text-xs focus:border-[#4cd7f6] focus:ring-1 focus:ring-[#4cd7f6]/50 outline-none transition-all"
+              placeholder={config.baseUrl.includes('openrouter.ai') ? 'deepseek/deepseek-chat' : 'gpt-4o, deepseek-chat'}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-100 font-mono text-xs focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/40 outline-none transition-all"
             />
           </div>
 
-          {/* Skenario 1: Prefix tidak diperlukan pada endpoint resmi (misal: deepseek/deepseek-v4.1-flash di api.deepseek.com) */}
+          {/* Skenario 1: Prefix tidak diperlukan pada endpoint resmi */}
           {config.model.includes('/') && !config.baseUrl.includes('openrouter.ai') && (
             <button
               type="button"
               onClick={() => onChange({ ...config, model: config.model.split('/').pop() || config.model })}
-              className="text-[10px] text-[#f59e0b] hover:text-[#fbbf24] text-left font-mono flex items-center gap-1 transition cursor-pointer pt-0.5"
+              className="text-[10px] text-amber-400 hover:text-amber-300 text-left font-mono flex items-center gap-1.5 transition active:scale-[0.98] cursor-pointer pt-0.5"
               title="Klik untuk menghapus prefix vendor otomatis"
             >
-              <span>⚠️ Prefix tidak diperlukan. Ubah jadi: <u>{config.model.split('/').pop()}</u>?</span>
+              <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0 stroke-[1.75]" />
+              <span>Prefix tidak diperlukan. Ubah jadi: <u>{config.model.split('/').pop()}</u>?</span>
             </button>
           )}
 
-          {/* Skenario 2: Kurang prefix pada OpenRouter (misal: deepseek-v4.1-flash padahal butuh deepseek/deepseek-v4.1-flash) */}
+          {/* Skenario 2: Kurang prefix pada OpenRouter */}
           {config.baseUrl.includes('openrouter.ai') && !config.model.includes('/') && config.model.trim().length > 0 && (
             <button
               type="button"
@@ -294,11 +292,12 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
                 const suggestion = getMissingPrefixSuggestion(config.baseUrl, config.model) || `vendor/${config.model.trim()}`;
                 onChange({ ...config, model: suggestion });
               }}
-              className="text-[10px] text-[#4cd7f6] hover:text-[#7ee7fc] text-left font-mono flex items-center gap-1 transition cursor-pointer pt-0.5"
+              className="text-[10px] text-emerald-400 hover:text-emerald-300 text-left font-mono flex items-center gap-1.5 transition active:scale-[0.98] cursor-pointer pt-0.5"
               title="Klik untuk menambahkan prefix vendor OpenRouter"
             >
+              <Info className="w-3 h-3 text-emerald-400 shrink-0 stroke-[1.75]" />
               <span>
-                💡 OpenRouter butuh prefix vendor. Ubah jadi:{' '}
+                OpenRouter butuh prefix vendor. Ubah jadi:{' '}
                 <u>{getMissingPrefixSuggestion(config.baseUrl, config.model) || `vendor/${config.model.trim()}`}</u>?
               </span>
             </button>
@@ -307,68 +306,72 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
       </div>
 
       {/* Secondary Controls & Run Trigger Button */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pt-2 border-t border-white/[0.06]">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pt-2 border-t border-slate-800/80">
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
           {/* Context Stress Segmented Toggle */}
           <div className="relative flex items-center gap-2 font-mono text-xs tooltip-container">
             <div className="flex items-center gap-1">
-              <span className="text-[#bbcabf] uppercase tracking-wider font-semibold text-[11px]">
+              <span className="text-slate-400 uppercase tracking-wider font-normal text-[11px]">
                 Context Stress:
               </span>
               <button
                 type="button"
                 onClick={() => setActiveTooltip(activeTooltip === 'context' ? null : 'context')}
                 className={`p-1 rounded-md transition cursor-pointer ${
-                  activeTooltip === 'context' ? 'text-[#4cd7f6] bg-[#4cd7f6]/10' : 'text-[#86948a] hover:text-[#4cd7f6]'
+                  activeTooltip === 'context' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-400 hover:text-emerald-400'
                 }`}
                 title="Penjelasan & Analogi Context Stress"
                 aria-label="Info Context Stress"
               >
-                <HelpCircle className="w-3.5 h-3.5" />
+                <HelpCircle className="w-3.5 h-3.5 stroke-[1.75]" />
               </button>
             </div>
 
             {/* Context Stress Popover */}
             {activeTooltip === 'context' && (
-              <div className="absolute bottom-full mb-2.5 left-0 sm:left-auto w-[calc(100vw-3rem)] sm:w-84 max-w-sm p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-[#dfe2ee]">
-                <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
-                  <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
-                    <BookOpen className="w-3 h-3" />
+              <div className="absolute bottom-full mb-2.5 left-0 sm:left-auto w-[calc(100vw-3rem)] sm:w-84 max-w-sm p-4 rounded-xl bg-slate-900 border border-slate-700 shadow-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-slate-200">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                  <span className="font-semibold font-mono text-emerald-400 text-[11px] uppercase tracking-wide flex items-center gap-1.5">
+                    <BookOpen className="w-3 h-3 stroke-[1.75]" />
                     Apa Itu Context Stress?
                   </span>
                   <button
                     type="button"
                     onClick={() => setActiveTooltip(null)}
-                    className="text-[#86948a] hover:text-[#dfe2ee] p-0.5 cursor-pointer"
+                    className="text-slate-400 hover:text-slate-200 p-0.5 cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5 stroke-[1.75]" />
                   </button>
                 </div>
-                <p className="text-[#bbcabf] text-[11px] leading-relaxed">
-                  <strong>Fungsi:</strong> Menguji daya tahan memori AI saat disodori puluhan ribu kata sekaligus (4k hingga 32k token).
+                <p className="text-slate-300 text-[11px] leading-relaxed">
+                  <strong className="text-slate-100">Fungsi:</strong> Menguji daya tahan memori AI saat disodori puluhan ribu kata sekaligus (4k hingga 32k token).
                 </p>
-                <div className="bg-[#1c2028] p-2.5 rounded-lg border border-white/[0.06] text-[11px] text-[#dfe2ee] space-y-1">
-                  <span className="text-[#4edea3] font-semibold font-mono block">💡 Analogi Sederhana:</span>
-                  <p className="text-[#bbcabf] leading-relaxed">
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-200 space-y-1">
+                  <span className="text-emerald-400 font-medium font-mono flex items-center gap-1">
+                    <BookOpen className="w-3 h-3 text-emerald-400 stroke-[1.75]" />
+                    Analogi Sederhana:
+                  </span>
+                  <p className="text-slate-400 leading-relaxed">
                     Seperti menyuruh murid membaca buku tebal 100 halaman, lalu diselipkan 1 kalimat sandi rahasia di halaman 82. AI resmi berotak GPU sanggup mengingat dan menjawabnya. Akun tiruan (bot scraper chat gratisan) otaknya akan "kram", memotong teks secara diam-diam (*silent truncate*), atau langsung error 502.
                   </p>
                 </div>
-                <div className="text-[10px] text-[#86948a] font-mono">
-                  💡 <em>Rekomendasi:</em> Pilih <strong>8k</strong> untuk tes cepat, atau <strong>16k-32k</strong> untuk uji ketahanan batas GPU.
+                <div className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
+                  <Info className="w-3 h-3 text-emerald-400 stroke-[1.75]" />
+                  <span><em>Rekomendasi:</em> Pilih <strong>8k</strong> untuk tes cepat, atau <strong>16k-32k</strong> untuk uji ketahanan batas GPU.</span>
                 </div>
               </div>
             )}
 
-            <div className="flex items-center rounded-xl bg-[#0a0e16]/90 p-1 border border-white/[0.08] gap-1">
+            <div className="flex items-center rounded-xl bg-slate-950 p-1 border border-slate-800 gap-1">
               {[4000, 8000, 16000, 32000].map((size) => (
                 <button
                   key={size}
                   type="button"
                   onClick={() => onChange({ ...config, contextSize: size })}
-                  className={`px-3 py-1 rounded-lg text-xs font-mono transition cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-xs font-mono transition active:scale-[0.98] cursor-pointer ${
                     config.contextSize === size
-                      ? 'bg-[#4cd7f6]/20 text-[#4cd7f6] border border-[#4cd7f6]/40 font-semibold shadow-sm'
-                      : 'text-[#bbcabf] hover:text-[#dfe2ee]'
+                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40 font-medium'
+                      : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
                   {size / 1000}k
@@ -380,49 +383,52 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
           {/* Mode Switcher */}
           <div className="relative flex items-center gap-2 font-mono text-xs tooltip-container">
             <div className="flex items-center gap-1">
-              <span className="text-[#bbcabf] uppercase tracking-wider font-semibold text-[11px]">
+              <span className="text-slate-400 uppercase tracking-wider font-normal text-[11px]">
                 Protocol:
               </span>
               <button
                 type="button"
                 onClick={() => setActiveTooltip(activeTooltip === 'protocol' ? null : 'protocol')}
                 className={`p-1 rounded-md transition cursor-pointer ${
-                  activeTooltip === 'protocol' ? 'text-[#4cd7f6] bg-[#4cd7f6]/10' : 'text-[#86948a] hover:text-[#4cd7f6]'
+                  activeTooltip === 'protocol' ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-400 hover:text-emerald-400'
                 }`}
                 title="Penjelasan & Analogi Protocol"
                 aria-label="Info Protocol"
               >
-                <HelpCircle className="w-3.5 h-3.5" />
+                <HelpCircle className="w-3.5 h-3.5 stroke-[1.75]" />
               </button>
             </div>
 
             {/* Protocol Popover */}
             {activeTooltip === 'protocol' && (
-              <div className="absolute bottom-full mb-2.5 right-0 sm:left-0 sm:right-auto w-[calc(100vw-3rem)] sm:w-84 max-w-sm p-4 rounded-xl bg-[#0a0e16]/95 border border-[#4cd7f6]/30 shadow-2xl backdrop-blur-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-[#dfe2ee]">
-                <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
-                  <span className="font-bold font-mono text-[#4cd7f6] text-[11px] uppercase tracking-wide flex items-center gap-1.5">
-                    <BookOpen className="w-3 h-3" />
+              <div className="absolute bottom-full mb-2.5 right-0 sm:left-0 sm:right-auto w-[calc(100vw-3rem)] sm:w-84 max-w-sm p-4 rounded-xl bg-slate-900 border border-slate-700 shadow-xl z-40 font-sans text-xs space-y-2.5 animate-fade-in text-slate-200">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                  <span className="font-semibold font-mono text-emerald-400 text-[11px] uppercase tracking-wide flex items-center gap-1.5">
+                    <BookOpen className="w-3 h-3 stroke-[1.75]" />
                     Apa Itu Protocol?
                   </span>
                   <button
                     type="button"
                     onClick={() => setActiveTooltip(null)}
-                    className="text-[#86948a] hover:text-[#dfe2ee] p-0.5 cursor-pointer"
+                    className="text-slate-400 hover:text-slate-200 p-0.5 cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5 stroke-[1.75]" />
                   </button>
                 </div>
-                <div className="space-y-1.5 text-[11px] text-[#bbcabf]">
+                <div className="space-y-1.5 text-[11px] text-slate-300">
                   <p>
-                    <strong className="text-[#4edea3]">Direct Client:</strong> Browser Anda memanggil API secara langsung tanpa server perantara. Mode ini wajib jika dideploy di web hosting statis seperti Netlify.
+                    <strong className="text-emerald-400 font-medium">Direct Client:</strong> Browser Anda memanggil API secara langsung tanpa server perantara. Mode ini wajib jika dideploy di web hosting statis seperti Netlify.
                   </p>
                   <p>
-                    <strong className="text-[#4cd7f6]">Server Proxy:</strong> Request dikirim lewat server backend lokal. Berfungsi menembus batasan CORS browser dan mengukur latensi jaringan murni.
+                    <strong className="text-emerald-400 font-medium">Server Proxy:</strong> Request dikirim lewat server backend lokal. Berfungsi menembus batasan CORS browser dan mengukur latensi jaringan murni.
                   </p>
                 </div>
-                <div className="bg-[#1c2028] p-2.5 rounded-lg border border-white/[0.06] text-[11px] text-[#dfe2ee] space-y-1">
-                  <span className="text-[#4edea3] font-semibold font-mono block">💡 Analogi Sederhana:</span>
-                  <p className="text-[#bbcabf] leading-relaxed">
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-200 space-y-1">
+                  <span className="text-emerald-400 font-medium font-mono flex items-center gap-1">
+                    <BookOpen className="w-3 h-3 text-emerald-400 stroke-[1.75]" />
+                    Analogi Sederhana:
+                  </span>
+                  <p className="text-slate-400 leading-relaxed">
                     <strong>Direct Client</strong> = Seperti Anda mengantar surat sendiri langsung ke rumah kantor AI (bisa dicegat satpam/CORS jika mereka menolak pengunjung luar).<br />
                     <strong>Server Proxy</strong> = Menitipkan surat ke kurir berlisensi khusus yang punya akses resmi tanpa dicegat satpam.
                   </p>
@@ -430,59 +436,59 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
               </div>
             )}
 
-            <div className="flex items-center rounded-xl bg-[#0a0e16]/90 p-1 border border-white/[0.08] gap-1">
+            <div className="flex items-center rounded-xl bg-slate-950 p-1 border border-slate-800 gap-1">
               <button
                 type="button"
                 onClick={() => onChange({ ...config, proxyMode: 'server' })}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono transition cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono transition active:scale-[0.98] cursor-pointer ${
                   config.proxyMode === 'server'
-                    ? 'bg-[#262a33] text-[#4cd7f6] border border-[#4cd7f6]/40 font-semibold shadow-sm'
-                    : 'text-[#bbcabf] hover:text-[#dfe2ee]'
+                    ? 'bg-slate-800 text-emerald-400 border border-emerald-500/40 font-medium'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
                 title="Bypass CORS dan catat TTFT mikrodetik"
               >
-                <Server className="w-3 h-3 text-[#4cd7f6]" />
+                <Server className="w-3 h-3 text-emerald-400 stroke-[1.75]" />
                 <span>Server Proxy</span>
               </button>
               <button
                 type="button"
                 onClick={() => onChange({ ...config, proxyMode: 'browser' })}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono transition cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono transition active:scale-[0.98] cursor-pointer ${
                   config.proxyMode === 'browser'
-                    ? 'bg-[#262a33] text-[#4edea3] border border-[#4edea3]/40 font-semibold shadow-sm'
-                    : 'text-[#bbcabf] hover:text-[#dfe2ee]'
+                    ? 'bg-slate-800 text-emerald-400 border border-emerald-500/40 font-medium'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
                 title="Langsung memanggil dari browser pengunjung (cocok untuk Netlify)"
               >
-                <Globe className="w-3 h-3 text-[#4edea3]" />
+                <Globe className="w-3 h-3 text-emerald-400 stroke-[1.75]" />
                 <span>Direct Client</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* High-impact Glowing Trigger Button */}
+        {/* High-impact Solid Primary Accent Button */}
         <div>
           <button
             type="button"
             onClick={onRunAll}
             disabled={isRunning || !config.baseUrl || !config.model}
-            className={`w-full sm:w-auto relative group overflow-hidden px-8 py-3 rounded-xl font-bold font-mono text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer ${
+            className={`w-full sm:w-auto relative group overflow-hidden px-8 py-3 rounded-xl font-semibold font-mono text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer active:scale-[0.98] ${
               isRunning
-                ? 'bg-[#262a33] text-[#bbcabf] cursor-not-allowed border border-white/10'
-                : 'bg-gradient-to-r from-[#4edea3] to-[#4cd7f6] text-[#003824] shadow-[0_0_24px_rgba(78,222,163,0.35)] hover:shadow-[0_0_36px_rgba(78,222,163,0.55)] active:scale-[0.99]'
+                ? 'bg-slate-800 text-slate-400 cursor-not-allowed border border-slate-700'
+                : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-sm'
             }`}
           >
             {isRunning ? (
               <>
-                <div className="w-4 h-4 border-2 border-[#4cd7f6] border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
                 <span>VERIFYING SENSORS...</span>
               </>
             ) : (
               <>
-                <Radar className="w-4 h-4 transition-transform group-hover:rotate-180 duration-500 text-[#003824]" />
+                <Radar className="w-4 h-4 text-slate-950 stroke-[1.75]" />
                 <span className="tracking-wide">RUN FORENSIC AUDIT</span>
-                <kbd className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-black/25 text-[10px] text-[#003824] font-mono border border-black/20 font-medium">
+                <kbd className="hidden sm:inline-block px-2 py-0.5 rounded-full bg-slate-950/20 text-[10px] text-slate-950 font-mono border border-slate-950/20 font-medium">
                   ⌘ Enter
                 </kbd>
               </>
@@ -492,15 +498,15 @@ export const EndpointConfigCard: React.FC<EndpointConfigProps> = ({
       </div>
 
       {/* Token Quota / Balance Warning Banner */}
-      <div className="flex items-start sm:items-center gap-2.5 px-4 py-3 rounded-xl bg-[#f59e0b]/10 border border-[#f59e0b]/30 text-[#f59e0b] text-xs font-mono">
-        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 sm:mt-0 text-[#f59e0b]" />
-        <div className="flex-1 leading-relaxed text-[11px] text-[#dfe2ee]">
-          <strong className="text-[#f59e0b] uppercase tracking-wide mr-1.5">
+      <div className="flex items-start sm:items-center gap-2.5 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-mono">
+        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 sm:mt-0 text-amber-400 stroke-[1.75]" />
+        <div className="flex-1 leading-relaxed text-[11px] text-slate-300">
+          <strong className="text-amber-400 uppercase tracking-wide mr-1.5 font-semibold">
             Perhatian: Penggunaan Kuota &amp; Saldo Token:
           </strong>
           Tindakan ini mengirimkan request uji nyata ke server AI Anda (termasuk injeksi{' '}
-          <strong className="text-[#4cd7f6]">{config.contextSize / 1000}k token</strong> pada stress test context window).{' '}
-          Tindakan ini <strong className="text-[#f59e0b]">akan memotong kuota token / saldo billing aktif</strong> pada API Key yang Anda pasang.
+          <strong className="text-emerald-400 font-medium">{config.contextSize / 1000}k token</strong> pada stress test context window).{' '}
+          Tindakan ini <strong className="text-amber-400 font-semibold">akan memotong kuota token / saldo billing aktif</strong> pada API Key yang Anda pasang.
         </div>
       </div>
     </section>

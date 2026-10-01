@@ -105,71 +105,76 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#1c2028] border border-white/[0.1] rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in font-sans">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/[0.08]">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-800">
           <div className="flex items-center gap-2">
-            <Download className="w-5 h-5 text-[#4edea3]" />
-            <h3 className="text-base font-bold text-[#dfe2ee] font-mono">Ekspor Laporan Audit Keaslian Model</h3>
+            <Download className="w-5 h-5 text-emerald-400 stroke-[1.75]" />
+            <h3 className="text-base font-semibold text-slate-100 font-mono">Ekspor Laporan Audit Keaslian Model</h3>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-[#bbcabf] hover:text-[#dfe2ee] transition p-1 cursor-pointer"
+            className="text-slate-400 hover:text-slate-200 transition p-1 cursor-pointer rounded-lg hover:bg-slate-800"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 stroke-[1.75]" />
           </button>
         </div>
 
         {/* Tab Selector */}
-        <div className="flex items-center gap-2 px-5 pt-4 bg-[#181c24] border-b border-white/[0.08]">
+        <div className="flex items-center gap-2 px-5 pt-4 bg-slate-950 border-b border-slate-800">
           <button
+            type="button"
             onClick={() => setTab('markdown')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold font-mono border-b-2 transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold font-mono border-b-2 transition cursor-pointer active:scale-[0.98] ${
               tab === 'markdown'
-                ? 'border-[#4edea3] text-[#4edea3]'
-                : 'border-transparent text-[#bbcabf] hover:text-[#dfe2ee]'
+                ? 'border-emerald-500 text-emerald-400'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <FileText className="w-4 h-4" />
+            <FileText className="w-4 h-4 stroke-[1.75]" />
             <span>Format Markdown (.md)</span>
           </button>
           <button
+            type="button"
             onClick={() => setTab('json')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold font-mono border-b-2 transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold font-mono border-b-2 transition cursor-pointer active:scale-[0.98] ${
               tab === 'json'
-                ? 'border-[#4edea3] text-[#4edea3]'
-                : 'border-transparent text-[#bbcabf] hover:text-[#dfe2ee]'
+                ? 'border-emerald-500 text-emerald-400'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Code className="w-4 h-4" />
+            <Code className="w-4 h-4 stroke-[1.75]" />
             <span>Format JSON Raw (.json)</span>
           </button>
         </div>
 
         {/* Content Viewer */}
-        <div className="p-4 overflow-y-auto flex-1 bg-[#0a0e16] font-mono text-xs text-[#dfe2ee]/90">
+        <div className="p-4 overflow-y-auto flex-1 bg-slate-950 font-mono text-xs text-slate-300">
           <pre className="whitespace-pre-wrap select-all">{exportText}</pre>
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between p-4 bg-[#181c24] border-t border-white/[0.08]">
-          <span className="text-xs text-[#bbcabf] font-mono">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-slate-950 border-t border-slate-800">
+          <span className="text-xs text-slate-400 font-mono">
             Dapat langsung dilampirkan ke tiket komplain support atau GitHub.
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
+              type="button"
               onClick={handleCopy}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#262a33] hover:bg-[#31353e] text-[#dfe2ee] text-xs font-semibold font-mono transition cursor-pointer border border-white/[0.08]"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold font-mono transition cursor-pointer border border-slate-700 active:scale-[0.98]"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-[#4edea3]" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" /> : <Copy className="w-3.5 h-3.5 stroke-[1.75]" />}
               <span>{copied ? 'Tersalin!' : 'Salin Teks'}</span>
             </button>
             <button
+              type="button"
               onClick={handleDownload}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#4edea3] hover:bg-[#4edea3]/90 text-[#003824] text-xs font-bold font-mono transition shadow-lg shadow-[#4edea3]/20 cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold font-mono transition active:scale-[0.98] cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 stroke-[1.75]" />
               <span>Unduh File</span>
             </button>
           </div>

@@ -41,25 +41,22 @@ export const LiveStreamViewer: React.FC<LiveStreamViewerProps> = ({
   if (!isVisible && !streamText) return null;
 
   return (
-    <section className="bg-[#0a0e16]/90 rounded-xl border border-[#4cd7f6]/25 shadow-2xl p-4 sm:p-6 flex flex-col gap-4 relative overflow-hidden font-mono">
-      {/* Top glowing laser line */}
-      <div className="absolute top-0 right-0 w-96 h-1 bg-gradient-to-r from-transparent via-[#4cd7f6] to-[#4edea3]" />
-
+    <section className="bg-slate-900 rounded-2xl border border-slate-800 shadow-xl p-4 sm:p-6 flex flex-col gap-4 relative overflow-hidden font-mono">
       {/* Header telemetry and stat blocks */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-white/[0.08] pb-4">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
         {/* Status Pill */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#4cd7f6]/10 border border-[#4cd7f6]/25">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4cd7f6] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#4cd7f6]"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
             </span>
-            <span className="text-xs text-[#4cd7f6] font-bold tracking-wide font-mono">
+            <span className="text-xs text-emerald-400 font-medium tracking-wide font-mono">
               STREAM TELEMETRY // {isVisible ? 'SSE ACTIVE 200 OK' : 'BUFFER READY'}
             </span>
           </div>
-          <span className="text-white/20 hidden sm:inline">|</span>
-          <span className="text-xs text-[#bbcabf] font-mono truncate max-w-xs">
+          <span className="text-slate-700 hidden sm:inline">|</span>
+          <span className="text-xs text-slate-400 font-mono font-normal truncate max-w-xs">
             {currentTestName || 'Idle Inspector'}
           </span>
         </div>
@@ -67,24 +64,24 @@ export const LiveStreamViewer: React.FC<LiveStreamViewerProps> = ({
         {/* 4 Live Metric Blocks */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-center">
           {/* TTFT */}
-          <div className="bg-[#181c24] px-3.5 py-2 rounded-xl border border-white/[0.06] flex flex-col gap-0.5">
-            <span className="text-[10px] text-[#bbcabf] uppercase tracking-wider font-mono">Time To First Token</span>
-            <span className={`font-bold text-xs sm:text-sm font-mono ${ttftMs !== null && ttftMs <= 850 ? 'text-[#4edea3]' : ttftMs !== null && ttftMs <= 2000 ? 'text-[#f59e0b]' : 'text-[#4cd7f6]'}`}>
+          <div className="bg-slate-950 px-3.5 py-2 rounded-xl border border-slate-800 flex flex-col gap-0.5">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono font-normal">Time To First Token</span>
+            <span className={`font-semibold text-xs sm:text-sm font-mono ${ttftMs !== null && ttftMs <= 850 ? 'text-emerald-400' : ttftMs !== null && ttftMs <= 2000 ? 'text-amber-400' : 'text-slate-200'}`}>
               {ttftMs !== null ? `${ttftMs} ms` : '--'}
             </span>
           </div>
 
           {/* Throughput */}
-          <div className="bg-[#181c24] px-3.5 py-2 rounded-xl border border-white/[0.06] flex flex-col gap-0.5">
-            <span className="text-[10px] text-[#bbcabf] uppercase tracking-wider font-mono">Throughput Rate</span>
+          <div className="bg-slate-950 px-3.5 py-2 rounded-xl border border-slate-800 flex flex-col gap-0.5">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono font-normal">Throughput Rate</span>
             <div className="flex items-center gap-2">
-              <span className="text-[#4edea3] font-bold text-xs sm:text-sm font-mono">
+              <span className="text-emerald-400 font-semibold text-xs sm:text-sm font-mono">
                 {tokensPerSec > 0 ? `${tokensPerSec} tok/s` : '--'}
               </span>
               {tokensPerSec > 0 && (
-                <div className="w-6 h-1.5 bg-[#4edea3]/20 rounded-full overflow-hidden">
+                <div className="w-6 h-1.5 bg-emerald-950 rounded-full overflow-hidden border border-emerald-500/20">
                   <div
-                    className="h-full bg-[#4edea3] rounded-full transition-all duration-300"
+                    className="h-full bg-emerald-400 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(100, (tokensPerSec / 80) * 100)}%` }}
                   />
                 </div>
@@ -93,17 +90,17 @@ export const LiveStreamViewer: React.FC<LiveStreamViewerProps> = ({
           </div>
 
           {/* Total Rendered */}
-          <div className="bg-[#181c24] px-3.5 py-2 rounded-xl border border-white/[0.06] flex flex-col gap-0.5">
-            <span className="text-[10px] text-[#bbcabf] uppercase tracking-wider font-mono">Tokens Rendered</span>
-            <span className="text-[#dfe2ee] font-bold text-xs sm:text-sm font-mono">
+          <div className="bg-slate-950 px-3.5 py-2 rounded-xl border border-slate-800 flex flex-col gap-0.5">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono font-normal">Tokens Rendered</span>
+            <span className="text-slate-200 font-semibold text-xs sm:text-sm font-mono">
               {tokenCount > 0 ? `${tokenCount} chunks` : '--'}
             </span>
           </div>
 
           {/* Active Status */}
-          <div className="bg-[#181c24] px-3.5 py-2 rounded-xl border border-white/[0.06] flex flex-col gap-0.5">
-            <span className="text-[10px] text-[#bbcabf] uppercase tracking-wider font-mono">Sensor State</span>
-            <span className={`font-bold text-xs sm:text-sm font-mono ${isVisible ? 'text-[#4cd7f6] animate-pulse' : 'text-[#86948a]'}`}>
+          <div className="bg-slate-950 px-3.5 py-2 rounded-xl border border-slate-800 flex flex-col gap-0.5">
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono font-normal">Sensor State</span>
+            <span className={`font-semibold text-xs sm:text-sm font-mono ${isVisible ? 'text-emerald-400 animate-pulse' : 'text-slate-400'}`}>
               {isVisible ? 'RECORDING' : 'READY'}
             </span>
           </div>
@@ -111,17 +108,17 @@ export const LiveStreamViewer: React.FC<LiveStreamViewerProps> = ({
       </div>
 
       {/* Real-time status sub-bar */}
-      <div className="flex items-center justify-between text-xs font-mono text-[#4cd7f6] px-1">
+      <div className="flex items-center justify-between text-xs font-mono text-slate-300 px-1">
         <div className="flex items-center gap-2 truncate">
-          <Radio className="w-3.5 h-3.5 animate-pulse shrink-0 text-[#4cd7f6]" />
-          <span className="truncate">{statusMessage || 'Menunggu transmisi streaming...'}</span>
+          <Radio className="w-3.5 h-3.5 animate-pulse shrink-0 text-emerald-400 stroke-[1.75]" />
+          <span className="truncate font-normal">{statusMessage || 'Menunggu transmisi streaming...'}</span>
         </div>
         {onClear && (
           <button
             onClick={onClear}
-            className="flex items-center gap-1 text-[11px] text-[#bbcabf] hover:text-[#dfe2ee] transition cursor-pointer"
+            className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-200 active:scale-[0.98] transition cursor-pointer font-normal"
           >
-            <Trash2 className="w-3 h-3" />
+            <Trash2 className="w-3 h-3 stroke-[1.75]" />
             <span>Bersihkan</span>
           </button>
         )}
@@ -130,12 +127,12 @@ export const LiveStreamViewer: React.FC<LiveStreamViewerProps> = ({
       {/* Terminal View */}
       <div
         ref={terminalRef}
-        className="h-60 overflow-y-auto bg-[#0f131c]/90 p-4 rounded-xl border border-white/[0.06] space-y-1.5 font-mono text-xs text-[#dfe2ee]/90 select-text leading-relaxed shadow-inner"
+        className="h-60 overflow-y-auto bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5 font-mono text-xs text-slate-300 select-text leading-relaxed shadow-inner"
       >
         {streamText ? (
-          <pre className="whitespace-pre-wrap font-mono text-xs">{streamText}</pre>
+          <pre className="whitespace-pre-wrap font-mono text-xs text-slate-200">{streamText}</pre>
         ) : (
-          <div className="text-[#bbcabf]/50 italic text-xs">
+          <div className="text-slate-500 italic text-xs">
             [TELEMETRY CONSOLE ACTIVE] Paket chunk streaming SSE akan tampil di sini secara real-time...
           </div>
         )}

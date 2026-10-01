@@ -1,18 +1,57 @@
 import React, { useState } from 'react';
-import { Download, Share2, Check, ShieldCheck, AlertTriangle, ShieldAlert, Cpu, Zap, Activity } from 'lucide-react';
+import { Download, Share2, Check, ShieldCheck, AlertTriangle, AlertCircle, ShieldAlert, Cpu, Zap, Activity, RefreshCw, Play } from 'lucide-react';
 import { OverallVerdict, TestResult } from '../types';
 
 interface VerdictBadgeProps {
   verdict: OverallVerdict;
   results: TestResult[];
   onExport: () => void;
+  onRetry?: () => void;
+  hasValidConfig?: boolean;
 }
 
-export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, onExport }) => {
+export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
+  verdict,
+  results,
+  onExport,
+  onRetry,
+  hasValidConfig = true,
+}) => {
   const [copiedShare, setCopiedShare] = useState(false);
   const isFinished = results.some((r) => r.status !== 'idle' && r.status !== 'running');
 
-  if (!isFinished) return null;
+  // Empty State: Before tests are run
+  if (!isFinished) {
+    return (
+      <section className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-7 shadow-lg relative overflow-hidden transition-all duration-200">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 font-mono text-xs text-slate-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>RADAR ATTESTATION // SIAP AUDIT</span>
+            </div>
+            <h3 className="text-base sm:text-lg font-semibold text-slate-100 font-sans tracking-tight">
+              Belum Ada Sesi Audit yang Berjalan
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-400 font-normal leading-relaxed">
+              Tentukan target Base URL dan nama model pada konfigurasi di atas, lalu jalankan pengujian untuk mengukur TTFT streaming, integritas logprobs softmax, identitas tokenizer, dan stress context window.
+            </p>
+          </div>
+          {onRetry && (
+            <button
+              type="button"
+              onClick={onRetry}
+              disabled={!hasValidConfig}
+              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] text-slate-950 font-mono text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0 w-full sm:w-auto"
+            >
+              <Play className="w-3.5 h-3.5 fill-current stroke-[1.75]" />
+              <span>Mulai Audit Forensik</span>
+            </button>
+          )}
+        </div>
+      </section>
+    );
+  }
 
   const isAuthentic = verdict.verdict === 'authentic';
   const isSuspicious = verdict.verdict === 'suspicious';
@@ -32,58 +71,51 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
   const getTheme = () => {
     if (isAuthentic) {
       return {
-        border: 'border-[#4edea3]/40 shadow-[0_0_40px_rgba(16,185,129,0.15)]',
-        circleColor: 'text-[#4edea3]',
-        badgeBg: 'bg-[#4edea3]/15 border-[#4edea3]/40 text-[#4edea3]',
-        accentText: 'text-[#4edea3]',
-        dotColor: 'bg-[#4edea3]',
-        gradientAura: 'bg-[#4edea3]/10',
+        border: 'border-emerald-500/30',
+        circleColor: 'text-emerald-400',
+        badgeBg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
+        accentText: 'text-emerald-400',
+        dotColor: 'bg-emerald-400',
       };
     }
     if (isInvalidConfig) {
       return {
-        border: 'border-[#f59e0b]/40 shadow-[0_0_40px_rgba(245,158,11,0.15)]',
-        circleColor: 'text-[#f59e0b]',
-        badgeBg: 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b]',
-        accentText: 'text-[#f59e0b]',
-        dotColor: 'bg-[#f59e0b]',
-        gradientAura: 'bg-[#f59e0b]/10',
+        border: 'border-amber-500/30',
+        circleColor: 'text-amber-400',
+        badgeBg: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
+        accentText: 'text-amber-400',
+        dotColor: 'bg-amber-400',
       };
     }
     if (isSuspicious) {
       return {
-        border: 'border-[#f59e0b]/40 shadow-[0_0_40px_rgba(245,158,11,0.15)]',
-        circleColor: 'text-[#f59e0b]',
-        badgeBg: 'bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b]',
-        accentText: 'text-[#f59e0b]',
-        dotColor: 'bg-[#f59e0b]',
-        gradientAura: 'bg-[#f59e0b]/10',
+        border: 'border-amber-500/30',
+        circleColor: 'text-amber-400',
+        badgeBg: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
+        accentText: 'text-amber-400',
+        dotColor: 'bg-amber-400',
       };
     }
     return {
-      border: 'border-[#f43f5e]/40 shadow-[0_0_40px_rgba(244,63,94,0.15)]',
-      circleColor: 'text-[#f43f5e]',
-      badgeBg: 'bg-[#f43f5e]/15 border-[#f43f5e]/40 text-[#f43f5e]',
-      accentText: 'text-[#f43f5e]',
-      dotColor: 'bg-[#f43f5e]',
-      gradientAura: 'bg-[#f43f5e]/10',
+      border: 'border-rose-500/30',
+      circleColor: 'text-rose-400',
+      badgeBg: 'bg-rose-500/10 border-rose-500/30 text-rose-400',
+      accentText: 'text-rose-400',
+      dotColor: 'bg-rose-400',
     };
   };
 
   const theme = getTheme();
 
   return (
-    <section className={`bg-gradient-to-r from-[#181c24] via-[#1c2028] to-[#181c24] rounded-xl border ${theme.border} p-5 sm:p-8 relative overflow-hidden transition-all duration-500`}>
-      {/* Decorative aura */}
-      <div className={`absolute -left-16 -top-16 w-80 h-80 ${theme.gradientAura} rounded-full blur-3xl pointer-events-none`} />
-
+    <section className={`bg-slate-900 rounded-2xl border ${theme.border} p-5 sm:p-7 relative overflow-hidden transition-all duration-300 shadow-lg`}>
       <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8">
         {/* Radial HUD Gauge */}
-        <div className="relative flex-shrink-0 flex items-center justify-center w-48 h-48 sm:w-52 sm:h-52">
+        <div className="relative flex-shrink-0 flex items-center justify-center w-44 h-44 sm:w-48 sm:h-48">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
             {/* Background track */}
             <circle
-              className="text-[#31353e]"
+              className="text-slate-800"
               cx="80"
               cy="80"
               fill="transparent"
@@ -93,7 +125,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
             />
             {/* Progress circle */}
             <circle
-              className={`${theme.circleColor} transition-all duration-1000 ease-out`}
+              className={`${theme.circleColor} transition-all duration-700 ease-out`}
               cx="80"
               cy="80"
               fill="transparent"
@@ -102,30 +134,19 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
               strokeDasharray="440"
               strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
-              strokeWidth="9"
-            />
-            {/* Decorative inner dotted circle */}
-            <circle
-              className="text-[#4cd7f6]/30"
-              cx="80"
-              cy="80"
-              fill="transparent"
-              r="60"
-              stroke="currentColor"
-              strokeDasharray="2 6"
-              strokeWidth="1.5"
+              strokeWidth="8"
             />
           </svg>
 
           {/* Centered Score Readout */}
           <div className="absolute flex flex-col items-center justify-center text-center">
-            <span className="font-mono text-[10px] sm:text-[11px] text-[#bbcabf] uppercase tracking-widest">
+            <span className="font-mono text-[10px] text-slate-400 uppercase tracking-widest font-normal">
               AUTHENTICITY
             </span>
-            <span className="font-mono text-3xl sm:text-4xl font-extrabold text-[#dfe2ee] tracking-tight">
+            <span className="font-mono text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight">
               {verdict.score}%
             </span>
-            <span className={`font-mono text-[10px] ${theme.accentText} uppercase tracking-wider font-semibold`}>
+            <span className={`font-mono text-[10px] ${theme.accentText} uppercase tracking-wider font-medium`}>
               {isAuthentic ? 'VERIFIED' : isInvalidConfig ? 'CONFIG ERR' : isSuspicious ? 'ANOMALY' : 'MASKED'}
             </span>
           </div>
@@ -135,11 +156,19 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
         <div className="flex-1 space-y-4 text-center lg:text-left">
           {/* Status Badges */}
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 font-mono">
-            <div className={`px-3 py-1.5 rounded-full border ${theme.badgeBg} text-xs font-bold tracking-wide flex items-center gap-2`}>
-              <span className={`w-2 h-2 rounded-full ${theme.dotColor} animate-ping`} />
+            <div className={`px-3 py-1.5 rounded-full border ${theme.badgeBg} text-xs font-semibold tracking-wide flex items-center gap-2`}>
+              {isAuthentic ? (
+                <ShieldCheck className="w-4 h-4 text-emerald-400 stroke-[1.75]" />
+              ) : isInvalidConfig ? (
+                <AlertTriangle className="w-4 h-4 text-amber-400 stroke-[1.75]" />
+              ) : isSuspicious ? (
+                <AlertCircle className="w-4 h-4 text-amber-400 stroke-[1.75]" />
+              ) : (
+                <ShieldAlert className="w-4 h-4 text-rose-400 stroke-[1.75]" />
+              )}
               <span>{verdict.title}</span>
             </div>
-            <div className="px-3 py-1 rounded-full bg-[#262a33] border border-white/[0.08] text-[#4cd7f6] text-[11px]">
+            <div className="px-3 py-1 rounded-full bg-slate-800 border border-slate-700/80 text-slate-400 text-[11px] font-normal">
               {isAuthentic
                 ? 'ZERO MASKING DETECTED'
                 : isInvalidConfig
@@ -151,25 +180,25 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
           </div>
 
           {/* Diagnostic Text */}
-          <p className="text-sm sm:text-base text-[#dfe2ee] leading-relaxed max-w-3xl">
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl font-normal">
             {verdict.summary}
           </p>
 
           {/* Real Detected Model Callout when Masking */}
           {verdict.detectedRealModel && (
-            <div className="bg-[#f43f5e]/10 border border-[#f43f5e]/40 rounded-xl p-4 text-left font-mono space-y-2">
-              <div className="text-xs font-bold text-[#f43f5e] uppercase tracking-wider flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-[#f43f5e]" />
+            <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4 text-left font-mono space-y-2">
+              <div className="text-xs font-semibold text-rose-400 uppercase tracking-wider flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-rose-400 stroke-[1.75]" />
                 <span>IDENTITAS ASLI TERBONGKAR (SPOOFING DETECTED)</span>
               </div>
-              <div className="flex flex-wrap items-center gap-2 text-sm text-[#dfe2ee]">
-                <Cpu className="w-4 h-4 text-[#4cd7f6]" />
+              <div className="flex flex-wrap items-center gap-2 text-sm text-slate-200">
+                <Cpu className="w-4 h-4 text-emerald-400 stroke-[1.75]" />
                 <span>Backend inference sebenarnya berjalan di atas:</span>
-                <span className="font-bold text-[#4cd7f6] bg-[#4cd7f6]/10 px-2.5 py-1 rounded border border-[#4cd7f6]/30">
+                <span className="font-semibold text-emerald-400 bg-slate-950 px-2.5 py-1 rounded border border-emerald-500/30">
                   {verdict.detectedRealModel}
                 </span>
               </div>
-              <p className="text-[11px] text-[#bbcabf]">
+              <p className="text-[11px] text-slate-400 font-normal">
                 Model ini membocorkan identitas aslinya saat diuji token khusus atau prompt boundary, membuktikan adanya pengalihan (rerouting/masking).
               </p>
             </div>
@@ -177,12 +206,12 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
 
           {/* Diagnostic Highlight Cards or Recommendations */}
           {isInvalidConfig && verdict.recommendations?.length > 0 ? (
-            <div className="bg-[#0a0e16]/80 border border-[#f59e0b]/30 rounded-xl p-4 text-left font-mono text-xs space-y-2">
-              <span className="text-[#f59e0b] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4" />
+            <div className="bg-slate-950 border border-amber-500/30 rounded-xl p-4 text-left font-mono text-xs space-y-2">
+              <span className="text-amber-400 font-semibold text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 stroke-[1.75]" />
                 Langkah Perbaikan Konfigurasi:
               </span>
-              <ul className="list-disc list-inside space-y-1.5 text-[#dfe2ee] text-[11px] leading-relaxed">
+              <ul className="list-disc list-inside space-y-1.5 text-slate-300 text-[11px] leading-relaxed font-normal">
                 {verdict.recommendations.map((rec, i) => (
                   <li key={i}>{rec}</li>
                 ))}
@@ -190,29 +219,29 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-              <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
-                <div className="w-7 h-7 rounded-full bg-[#4cd7f6]/10 flex items-center justify-center shrink-0 border border-[#4cd7f6]/20">
-                  <Zap className="text-[#4cd7f6] w-3.5 h-3.5" />
+              <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-start gap-2.5 text-left">
+                <div className="w-7 h-7 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700/80">
+                  <Zap className="text-emerald-400 w-3.5 h-3.5 stroke-[1.75]" />
                 </div>
-                <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                <span className="font-mono text-[11px] text-slate-400 leading-relaxed font-normal">
                   TTFT &amp; Streaming Jitter dianalisis terhadap SLA resmi inference.
                 </span>
               </div>
 
-              <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
-                <div className="w-7 h-7 rounded-full bg-[#4edea3]/10 flex items-center justify-center shrink-0 border border-[#4edea3]/20">
-                  <Activity className="text-[#4edea3] w-3.5 h-3.5" />
+              <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-start gap-2.5 text-left">
+                <div className="w-7 h-7 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700/80">
+                  <Activity className="text-emerald-400 w-3.5 h-3.5 stroke-[1.75]" />
                 </div>
-                <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                <span className="font-mono text-[11px] text-slate-400 leading-relaxed font-normal">
                   Logprob entropy diverifikasi langsung dari lapisan softmax GPU.
                 </span>
               </div>
 
-              <div className="bg-[#0a0e16]/60 border border-white/[0.06] rounded-xl p-3 flex items-start gap-2.5 text-left">
-                <div className="w-7 h-7 rounded-full bg-[#4edea3]/10 flex items-center justify-center shrink-0 border border-[#4edea3]/20">
-                  <ShieldCheck className="text-[#4edea3] w-3.5 h-3.5" />
+              <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-start gap-2.5 text-left">
+                <div className="w-7 h-7 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700/80">
+                  <ShieldCheck className="text-emerald-400 w-3.5 h-3.5 stroke-[1.75]" />
                 </div>
-                <span className="font-mono text-[11px] text-[#dfe2ee] leading-relaxed">
+                <span className="font-mono text-[11px] text-slate-400 leading-relaxed font-normal">
                   Needle-in-haystack context window dievaluasi utuh tanpa truncate.
                 </span>
               </div>
@@ -220,22 +249,33 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({ verdict, results, on
           )}
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-3 pt-2 w-full">
+          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-2.5 pt-2 w-full">
+            {onRetry && (
+              <button
+                type="button"
+                onClick={onRetry}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono text-xs font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all duration-150 cursor-pointer shadow-sm"
+              >
+                <RefreshCw className="w-3.5 h-3.5 stroke-[1.75]" />
+                <span>Uji Ulang (Retry Audit)</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={onExport}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#262a33] hover:bg-[#31353e] text-[#dfe2ee] font-mono text-xs font-semibold border border-white/[0.1] flex items-center justify-center gap-2 transition cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 font-mono text-xs font-medium border border-slate-700 flex items-center justify-center gap-2 active:scale-[0.98] transition-all duration-150 cursor-pointer"
             >
-              <Download className="w-4 h-4 text-[#4cd7f6]" />
-              <span>Ekspor Laporan Audit (JSON / MD)</span>
+              <Download className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" />
+              <span>Ekspor Laporan Audit</span>
             </button>
 
             <button
               type="button"
               onClick={handleShareAttestation}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#1c2028] hover:bg-[#262a33] text-[#4cd7f6] font-mono text-xs font-semibold border border-[#4cd7f6]/30 flex items-center justify-center gap-2 transition cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 text-emerald-400 font-mono text-xs font-medium border border-emerald-500/30 flex items-center justify-center gap-2 active:scale-[0.98] transition-all duration-150 cursor-pointer"
             >
-              {copiedShare ? <Check className="w-4 h-4 text-[#4edea3]" /> : <Share2 className="w-4 h-4" />}
+              {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[1.75]" /> : <Share2 className="w-3.5 h-3.5 stroke-[1.75]" />}
               <span>{copiedShare ? 'Tersalin!' : 'Bagikan Hasil Audit'}</span>
             </button>
           </div>

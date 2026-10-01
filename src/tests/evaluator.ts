@@ -476,7 +476,7 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
       return {
         score: 0,
         verdict: 'invalid_config',
-        title: '⚠️ NAMA MODEL TIDAK DITEMUKAN / TIDAK VALID (404/400)',
+        title: 'NAMA MODEL TIDAK DITEMUKAN / TIDAK VALID (404/400)',
         summary: 'Penyedia API menolak permintaan karena nama model yang diinput tidak terdaftar pada server mereka (HTTP 400/404 Model Not Found). Hasil ini murni karena kesalahan nama model, bukan karena model palsu (masking).',
         recommendations: [
           'Periksa ejaan nama model pada input MODEL IDENTIFIER.',
@@ -491,7 +491,7 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
       return {
         score: 0,
         verdict: 'invalid_config',
-        title: '⚠️ API KEY TIDAK VALID / DITOLAK (401)',
+        title: 'API KEY TIDAK VALID / DITOLAK (401)',
         summary: 'Endpoint menolak pengujian karena API Key / Bearer Token tidak valid, tidak memiliki izin, atau telah kedaluwarsa (HTTP 401 Unauthorized). Hasil ini murni karena otentikasi akun gagal, bukan karena model palsu (masking).',
         recommendations: [
           'Periksa kembali nilai API Key yang Anda masukkan pada form konfigurasi.',
@@ -505,7 +505,7 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
       return {
         score: 0,
         verdict: 'invalid_config',
-        title: '⚠️ KUOTA / SALDO TOKEN API HABIS (429)',
+        title: 'KUOTA / SALDO TOKEN API HABIS (429)',
         summary: 'Penyedia API menolak pengujian karena kuota atau saldo billing pada akun API Key Anda telah habis (HTTP 429 Insufficient Quota). Hasil ini murni karena saldo habis, bukan karena model palsu (masking).',
         recommendations: [
           'Isi ulang saldo (top up billing) pada dashboard penyedia AI Anda.',
@@ -518,7 +518,7 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
       return {
         score: 0,
         verdict: 'invalid_config',
-        title: '⚠️ BASE URL TIDAK VALID / KONEKSI GAGAL',
+        title: 'BASE URL TIDAK VALID / KONEKSI GAGAL',
         summary: 'Aplikasi tidak dapat menghubungi alamat Base URL yang Anda masukkan (Koneksi gagal / URL 404 / Terblokir CORS). Hasil ini murni karena endpoint tidak dapat dijangkau, bukan karena model palsu (masking).',
         recommendations: [
           'Periksa kembali format Base URL (contoh: https://api.openai.com/v1 atau https://api.deepseek.com/v1).',
@@ -531,7 +531,7 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
     return {
       score: 0,
       verdict: 'invalid_config',
-      title: '⚠️ KONFIGURASI TIDAK VALID / ENDPOINT GAGAL DIHUBUNGI',
+      title: 'KONFIGURASI TIDAK VALID / ENDPOINT GAGAL DIHUBUNGI',
       summary: 'Semua pengujian gagal berkomunikasi dengan endpoint AI. Kegagalan ini disebabkan oleh Base URL, API Key, atau Model Identifier yang tidak valid, bukan karena indikasi manipulasi model.',
       recommendations: [
         'Periksa kembali ketiga parameter: Base URL, API Key, dan nama model.',
@@ -555,7 +555,7 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
     return {
       score: finalScore,
       verdict: 'authentic',
-      title: '🟢 TERVERIFIKASI ASLI (NATIVE UPSTREAM API)',
+      title: 'TERVERIFIKASI ASLI (NATIVE UPSTREAM API)',
       summary: 'Endpoint ini menunjukkan karakteristik otentik API resmi: latensi TTFT sangat rendah, pemahaman tokenizer native akurat, integritas context window penuh, dan mendukung parameter teknis tingkat rendah.',
       recommendations: [
         'Endpoint aman digunakan untuk implementasi produksi.',
@@ -566,7 +566,7 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
     return {
       score: finalScore,
       verdict: 'suspicious',
-      title: '🟡 MENCURIGAKAN (INKONSISTEN / AGGREGATOR WRAPPER)',
+      title: 'MENCURIGAKAN (INKONSISTEN / AGGREGATOR WRAPPER)',
       summary: 'Ditemukan beberapa anomali pada parameter teknis, latensi TTFT di atas ambang normal, atau pemotongan context window. Kemungkinan endpoint ini adalah aggregator tingkat kedua atau model terkompresi.',
       recommendations: [
         'Periksa apakah penyedia API menerapkan caching agresif atau rate-limiting internal.',
@@ -582,8 +582,8 @@ export function computeOverallVerdict(results: TestResult[]): OverallVerdict {
       score: finalScore,
       verdict: 'fake',
       title: detectedRealModel
-        ? `🔴 TERINDIKASI MASKING: TERDETEKSI SEBAGAI ${detectedRealModel.toUpperCase()}`
-        : '🔴 TERINDIKASI KUAT MASKING / REVERSE-PROXY PALSU',
+        ? `TERINDIKASI MASKING: TERDETEKSI SEBAGAI ${detectedRealModel.toUpperCase()}`
+        : 'TERINDIKASI KUAT MASKING / REVERSE-PROXY PALSU',
       summary: detectedRealModel
         ? `Endpoint ini terbukti melakukan masking. Model yang Anda minta sebenarnya dialihkan dan diproses oleh ${detectedRealModel}. Reseller membungkus model ini untuk meniru model yang Anda klaim demi memangkas biaya server.`
         : 'Endpoint ini terindikasi bukan API resmi upstream melainkan hasil masking (misalnya membungkus model murah seperti Llama/Qwen menjadi model mahal, atau melakukan scraping headless browser dari web gratisan).',

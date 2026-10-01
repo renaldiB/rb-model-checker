@@ -322,7 +322,6 @@ export const App: React.FC = () => {
           results={results}
           onExport={() => setExportOpen(true)}
           onRetry={handleRunAll}
-          hasValidConfig={Boolean(config.baseUrl && config.model)}
         />
 
         {/* SECTION 4: 5-MODULE FORENSIC TEST GRID */}

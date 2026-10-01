@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Share2, Check, ShieldCheck, AlertTriangle, AlertCircle, ShieldAlert, Cpu, Zap, Activity, RefreshCw, Play } from 'lucide-react';
+import { Download, Share2, Check, ShieldCheck, AlertTriangle, AlertCircle, ShieldAlert, Cpu, Zap, Activity, RefreshCw } from 'lucide-react';
 import { OverallVerdict, TestResult } from '../types';
 
 interface VerdictBadgeProps {
@@ -7,7 +7,6 @@ interface VerdictBadgeProps {
   results: TestResult[];
   onExport: () => void;
   onRetry?: () => void;
-  hasValidConfig?: boolean;
 }
 
 export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
@@ -15,43 +14,11 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
   results,
   onExport,
   onRetry,
-  hasValidConfig = true,
 }) => {
   const [copiedShare, setCopiedShare] = useState(false);
   const isFinished = results.some((r) => r.status !== 'idle' && r.status !== 'running');
 
-  // Empty State: Before tests are run
-  if (!isFinished) {
-    return (
-      <section className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-7 shadow-lg relative overflow-hidden transition-all duration-200">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 font-mono text-xs text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>RADAR ATTESTATION // SIAP AUDIT</span>
-            </div>
-            <h3 className="text-base sm:text-lg font-semibold text-slate-100 font-sans tracking-tight">
-              Belum Ada Sesi Audit yang Berjalan
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 font-normal leading-relaxed">
-              Tentukan target Base URL dan nama model pada konfigurasi di atas, lalu jalankan pengujian untuk mengukur TTFT streaming, integritas logprobs softmax, identitas tokenizer, dan stress context window.
-            </p>
-          </div>
-          {onRetry && (
-            <button
-              type="button"
-              onClick={onRetry}
-              disabled={!hasValidConfig}
-              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] text-slate-950 font-mono text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0 w-full sm:w-auto"
-            >
-              <Play className="w-3.5 h-3.5 fill-current stroke-[1.75]" />
-              <span>Mulai Audit Forensik</span>
-            </button>
-          )}
-        </div>
-      </section>
-    );
-  }
+  if (!isFinished) return null;
 
   const isAuthentic = verdict.verdict === 'authentic';
   const isSuspicious = verdict.verdict === 'suspicious';
